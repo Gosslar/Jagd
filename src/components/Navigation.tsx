@@ -3,23 +3,24 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from './AuthProvider';
 import { AuthDialog } from './AuthDialog';
 import { LogOut, User } from 'lucide-react';
-
 const scrollToSection = (sectionId: string) => {
   const element = document.getElementById(sectionId);
   if (element) {
-    element.scrollIntoView({ behavior: 'smooth' });
+    element.scrollIntoView({
+      behavior: 'smooth'
+    });
   }
 };
-
 export const Navigation: React.FC = () => {
-  const { user, signOut } = useAuth();
-
-  return (
-    <nav className="bg-green-800 text-white shadow-lg">
+  const {
+    user,
+    signOut
+  } = useAuth();
+  return <nav className="bg-green-800 text-white shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <h1 className="text-xl font-bold">Jagdrevier Waldfrieden</h1>
+            <h1 className="text-xl font-bold">Jagdrevier Weetzen</h1>
           </div>
           <div className="flex items-center space-x-4">
             <button onClick={() => scrollToSection('home')} className="hover:text-green-200 transition-colors">Start</button>
@@ -28,28 +29,18 @@ export const Navigation: React.FC = () => {
             <button onClick={() => scrollToSection('news')} className="hover:text-green-200 transition-colors">Aktuelles</button>
             <button onClick={() => scrollToSection('gallery')} className="hover:text-green-200 transition-colors">Galerie</button>
             <button onClick={() => scrollToSection('contact')} className="hover:text-green-200 transition-colors">Kontakt</button>
-            {user ? (
-              <div className="flex items-center space-x-2">
+            {user ? <div className="flex items-center space-x-2">
                 <span className="text-sm flex items-center gap-1">
                   <User className="h-4 w-4" />
                   {user.email}
                 </span>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={signOut}
-                  className="text-green-800 border-white hover:bg-white"
-                >
+                <Button variant="outline" size="sm" onClick={signOut} className="text-green-800 border-white hover:bg-white">
                   <LogOut className="h-4 w-4 mr-1" />
                   Abmelden
                 </Button>
-              </div>
-            ) : (
-              <AuthDialog />
-            )}
+              </div> : <AuthDialog />}
           </div>
         </div>
       </div>
-    </nav>
-  );
+    </nav>;
 };
