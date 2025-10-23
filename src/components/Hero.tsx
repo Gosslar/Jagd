@@ -5,7 +5,7 @@ export const Hero: React.FC = () => {
       backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('/images/jagd_wildlife_3.jpeg')`
     }} />
       <div className="relative z-10 text-center text-white max-w-4xl mx-auto px-4">
-        <h1 className="text-5xl md:text-6xl font-bold mb-6">Jagdrevier Weetz</h1>
+        <h1 className="text-5xl md:text-6xl font-bold mb-6">Jagdrevier Weetzen</h1>
         <p className="text-xl md:text-2xl mb-8 leading-relaxed">Erleben Sie nachhaltige Jagd in 340 Hektar naturbelassener Wald- und Feldlandschaft. Tradition, Respekt vor der Natur und verantwortungsvolle Hege stehen im Mittelpunkt unserer jagdlichen Aktivitäten.</p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <button onClick={() => document.getElementById('revier')?.scrollIntoView({
