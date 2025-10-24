@@ -65,7 +65,7 @@ export const Wildarten: React.FC = () => {
           <h3 className="text-xl font-bold text-green-900 mb-4">Wildbestandsmanagement</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="text-center">
-              <div className="text-2xl font-bold text-green-700 mb-2">~180</div>
+              <div className="text-2xl font-bold text-green-700 mb-2">~60</div>
               <p className="text-sm text-green-600">Stück Rehwild geschätzt</p>
             </div>
             <div className="text-center">
