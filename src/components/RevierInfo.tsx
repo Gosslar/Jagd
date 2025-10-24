@@ -76,10 +76,6 @@ export const RevierInfo: React.FC = () => {
                 <Badge variant="secondary">Ganzjährig</Badge>
               </div>
               <div className="flex justify-between items-center">
-                <span className="font-medium">Rotwild</span>
-                <Badge variant="secondary">August - Januar</Badge>
-              </div>
-              <div className="flex justify-between items-center">
                 <span className="font-medium">Damwild</span>
                 <Badge variant="secondary">September - Januar</Badge>
               </div>

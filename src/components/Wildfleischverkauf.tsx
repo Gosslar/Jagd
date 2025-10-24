@@ -50,18 +50,13 @@ export const Wildfleischverkauf: React.FC = () => {
     { produkt: 'Wildschweingulasch', kategorie: 'Schwarzwild', preis: '9.50', einheit: 'kg', verfügbar: true },
     { produkt: 'Wildschweinhackfleisch', kategorie: 'Schwarzwild', preis: '8.50', einheit: 'kg', verfügbar: true },
     
-    // Rotwild
-    { produkt: 'Hirschkeule', kategorie: 'Rotwild', preis: '24.00', einheit: 'kg', verfügbar: true },
-    { produkt: 'Hirschrücken', kategorie: 'Rotwild', preis: '32.00', einheit: 'kg', verfügbar: false },
-    { produkt: 'Hirschgulasch', kategorie: 'Rotwild', preis: '19.50', einheit: 'kg', verfügbar: true },
-    
     // Federwild
     { produkt: 'Fasan', kategorie: 'Federwild', preis: '12.00', einheit: 'Stück', verfügbar: true },
     { produkt: 'Wildente', kategorie: 'Federwild', preis: '8.50', einheit: 'Stück', verfügbar: false },
     { produkt: 'Wildgans', kategorie: 'Federwild', preis: '15.00', einheit: 'Stück', verfügbar: true }
   ];
 
-  const kategorien = ['Rehwild', 'Schwarzwild', 'Rotwild', 'Federwild'];
+  const kategorien = ['Rehwild', 'Schwarzwild', 'Federwild'];
 
   const addToWarenkorb = (item: WildfleischItem) => {
     const existingItem = warenkorb.find(w => w.produkt === item.produkt);
