@@ -51,9 +51,7 @@ export const Wildfleischverkauf: React.FC = () => {
     { produkt: 'Wildschweinhackfleisch', kategorie: 'Schwarzwild', preis: '8.50', einheit: 'kg', verfügbar: true },
     
     // Federwild
-    { produkt: 'Fasan', kategorie: 'Federwild', preis: '12.00', einheit: 'Stück', verfügbar: true },
-    { produkt: 'Wildente', kategorie: 'Federwild', preis: '8.50', einheit: 'Stück', verfügbar: false },
-    { produkt: 'Wildgans', kategorie: 'Federwild', preis: '15.00', einheit: 'Stück', verfügbar: true }
+    { produkt: 'Gänsebrust gefroren', kategorie: 'Federwild', preis: '29.90', einheit: 'kg', verfügbar: true }
   ];
 
   const kategorien = ['Rehwild', 'Schwarzwild', 'Federwild'];
