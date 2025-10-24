@@ -129,27 +129,6 @@ export const Contact: React.FC = () => {
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Öffnungszeiten Jagdhütte</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span>Montag - Freitag:</span>
-                    <span>Nach Vereinbarung</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Samstag:</span>
-                    <span>08:00 - 12:00 Uhr</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Sonntag:</span>
-                    <span>Geschlossen</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
           </div>
 
           {/* Contact Form */}

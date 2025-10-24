@@ -116,13 +116,6 @@ export const RevierInfo: React.FC = () => {
                     <p className="text-sm text-gray-600">Natürliche Äsungsflächen für das Wild</p>
                   </div>
                 </div>
-                <div className="flex items-start space-x-3">
-                  <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
-                  <div>
-                    <h4 className="font-medium">Jagdhütte</h4>
-                    <p className="text-sm text-gray-600">Zentrale Anlaufstelle mit Aufbrechplatz</p>
-                  </div>
-                </div>
               </div>
             </CardContent>
           </Card>
