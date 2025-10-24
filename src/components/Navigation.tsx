@@ -26,6 +26,8 @@ export const Navigation: React.FC = () => {
             <button onClick={() => scrollToSection('home')} className="hover:text-green-200 transition-colors">Start</button>
             <button onClick={() => scrollToSection('revier')} className="hover:text-green-200 transition-colors">Revier</button>
             <button onClick={() => scrollToSection('wildarten')} className="hover:text-green-200 transition-colors">Wildarten</button>
+            <button onClick={() => scrollToSection('rehkitzrettung')} className="hover:text-green-200 transition-colors">Rehkitzrettung</button>
+            <button onClick={() => scrollToSection('praedatorenmanagement')} className="hover:text-green-200 transition-colors">Prädatoren</button>
             <button onClick={() => scrollToSection('news')} className="hover:text-green-200 transition-colors">Aktuelles</button>
             <button onClick={() => scrollToSection('gallery')} className="hover:text-green-200 transition-colors">Galerie</button>
             <button onClick={() => scrollToSection('contact')} className="hover:text-green-200 transition-colors">Kontakt</button>

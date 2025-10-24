@@ -19,7 +19,8 @@ export const Footer: React.FC = () => {
               <li><button onClick={() => document.getElementById('home')?.scrollIntoView({ behavior: 'smooth' })} className="text-green-200 hover:text-white transition-colors">Start</button></li>
               <li><button onClick={() => document.getElementById('revier')?.scrollIntoView({ behavior: 'smooth' })} className="text-green-200 hover:text-white transition-colors">Revier</button></li>
               <li><button onClick={() => document.getElementById('wildarten')?.scrollIntoView({ behavior: 'smooth' })} className="text-green-200 hover:text-white transition-colors">Wildarten</button></li>
-              <li><button onClick={() => document.getElementById('news')?.scrollIntoView({ behavior: 'smooth' })} className="text-green-200 hover:text-white transition-colors">Aktuelles</button></li>
+              <li><button onClick={() => document.getElementById('rehkitzrettung')?.scrollIntoView({ behavior: 'smooth' })} className="text-green-200 hover:text-white transition-colors">Rehkitzrettung</button></li>
+              <li><button onClick={() => document.getElementById('praedatorenmanagement')?.scrollIntoView({ behavior: 'smooth' })} className="text-green-200 hover:text-white transition-colors">Prädatoren</button></li>
             </ul>
           </div>
           

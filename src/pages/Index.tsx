@@ -4,6 +4,8 @@ import { Navigation } from '@/components/Navigation';
 import { Hero } from '@/components/Hero';
 import { RevierInfo } from '@/components/RevierInfo';
 import { Wildarten } from '@/components/Wildarten';
+import { Rehkitzrettung } from '@/components/Rehkitzrettung';
+import { Praedatorenmanagement } from '@/components/Praedatorenmanagement';
 import { News } from '@/components/News';
 import { Gallery } from '@/components/Gallery';
 import { Contact } from '@/components/Contact';
@@ -18,6 +20,8 @@ const Index = () => {
         <Hero />
         <RevierInfo />
         <Wildarten />
+        <Rehkitzrettung />
+        <Praedatorenmanagement />
         <News />
         <Gallery />
         <Contact />
