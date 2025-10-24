@@ -6,6 +6,7 @@ import { RevierInfo } from '@/components/RevierInfo';
 import { Wildarten } from '@/components/Wildarten';
 import { Rehkitzrettung } from '@/components/Rehkitzrettung';
 import { Praedatorenmanagement } from '@/components/Praedatorenmanagement';
+import { Wildfleischverkauf } from '@/components/Wildfleischverkauf';
 import { News } from '@/components/News';
 import { Gallery } from '@/components/Gallery';
 import { Contact } from '@/components/Contact';
@@ -22,6 +23,7 @@ const Index = () => {
         <Wildarten />
         <Rehkitzrettung />
         <Praedatorenmanagement />
+        <Wildfleischverkauf />
         <News />
         <Gallery />
         <Contact />
