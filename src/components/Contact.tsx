@@ -114,14 +114,16 @@ export const Contact: React.FC = () => {
               <CardContent>
                 <div className="space-y-4">
                   <div>
-                    <h4 className="font-medium">Hans Müller</h4>
-                    <p className="text-sm text-gray-600">Revierleiter</p>
-                    <p className="text-sm text-gray-600">Tel: +49 (0) 123 456 789</p>
+                    <h4 className="font-medium">Christoph Burchard</h4>
+                    <p className="text-sm text-gray-600">Revierpächter</p>
+                    <p className="text-sm text-gray-600">Holtenserstrasse 4</p>
+                    <p className="text-sm text-gray-600">30952 Linderte</p>
                   </div>
                   <div>
-                    <h4 className="font-medium">Klaus Schmidt</h4>
-                    <p className="text-sm text-gray-600">Stellvertretender Revierleiter</p>
-                    <p className="text-sm text-gray-600">Tel: +49 (0) 123 456 790</p>
+                    <h4 className="font-medium">Ole Gosslar</h4>
+                    <p className="text-sm text-gray-600">Revierpächter</p>
+                    <p className="text-sm text-gray-600">Am Denkmal 16</p>
+                    <p className="text-sm text-gray-600">30952 Linderte</p>
                   </div>
                 </div>
               </CardContent>
