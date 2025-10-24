@@ -20,7 +20,7 @@ export const Navigation: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <h1 className="text-xl font-bold">Jagdrevier Weetzen</h1>
+            <h1 className="text-xl font-bold">Jagd Weetzen</h1>
           </div>
           <div className="flex items-center space-x-4">
             <button onClick={() => scrollToSection('home')} className="hover:text-green-200 transition-colors">Start</button>

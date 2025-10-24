@@ -83,7 +83,7 @@ export const Contact: React.FC = () => {
                   <Mail className="h-5 w-5 text-green-600" />
                   <div>
                     <p className="font-medium">E-Mail</p>
-                    <p className="text-gray-600">info@jagdrevier-waldfrieden.de</p>
+                    <p className="text-gray-600">info@jagd-weetzen.de</p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-3">
@@ -98,8 +98,8 @@ export const Contact: React.FC = () => {
                   <div>
                     <p className="font-medium">Adresse</p>
                     <p className="text-gray-600">
-                      Waldstraße 123<br />
-                      12345 Waldfrieden<br />
+                      Dorfstraße 45<br />
+                      30900 Weetzen<br />
                       Deutschland
                     </p>
                   </div>

@@ -232,7 +232,7 @@ export const Rehkitzrettung: React.FC = () => {
                 <div className="mt-4 p-4 bg-green-50 rounded-lg">
                   <p className="text-sm text-green-800">
                     <strong>Kontakt:</strong> Melden Sie sich bei unserem Rehkitzrettungs-Team 
-                    unter rehkitzrettung@jagdrevier-waldfrieden.de
+                    unter rehkitzrettung@jagd-weetzen.de
                   </p>
                 </div>
               </div>

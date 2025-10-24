@@ -394,7 +394,7 @@ export const Wildfleischverkauf: React.FC = () => {
                   <MapPin className="h-4 w-4 text-green-600 mt-0.5" />
                   <div className="text-sm">
                     <p>Abholung nach Vereinbarung</p>
-                    <p className="text-gray-600">Waldstraße 123, 12345 Weetzen</p>
+                    <p className="text-gray-600">Dorfstraße 45, 30900 Weetzen</p>
                   </div>
                 </div>
                 <div className="mt-4 p-3 bg-green-50 rounded-lg">

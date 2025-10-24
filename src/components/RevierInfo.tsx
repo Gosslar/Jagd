@@ -10,8 +10,8 @@ export const RevierInfo: React.FC = () => {
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">Unser Jagdrevier</h2>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Das Jagdrevier Waldfrieden erstreckt sich über 2.500 Hektar naturbelassener Wald- und Feldlandschaft 
-            im Herzen Deutschlands und bietet optimale Bedingungen für eine nachhaltige Jagd.
+            Jagd Weetzen erstreckt sich über 340 Hektar naturbelassener Wald- und Feldlandschaft 
+            in Niedersachsen und bietet optimale Bedingungen für eine nachhaltige Jagd.
           </p>
         </div>
 
@@ -22,7 +22,7 @@ export const RevierInfo: React.FC = () => {
               <MapPin className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">2.500 ha</div>
+              <div className="text-2xl font-bold">340 ha</div>
               <p className="text-xs text-muted-foreground">Wald- und Feldlandschaft</p>
             </CardContent>
           </Card>
@@ -44,7 +44,7 @@ export const RevierInfo: React.FC = () => {
               <Shield className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">24</div>
+              <div className="text-2xl font-bold">8</div>
               <p className="text-xs text-muted-foreground">Strategisch platziert</p>
             </CardContent>
           </Card>
@@ -55,7 +55,7 @@ export const RevierInfo: React.FC = () => {
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">12</div>
+              <div className="text-2xl font-bold">6</div>
               <p className="text-xs text-muted-foreground">Erfahrene Jäger</p>
             </CardContent>
           </Card>
@@ -102,7 +102,7 @@ export const RevierInfo: React.FC = () => {
                 <div className="flex items-start space-x-3">
                   <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
                   <div>
-                    <h4 className="font-medium">24 Hochsitze</h4>
+                    <h4 className="font-medium">8 Hochsitze</h4>
                     <p className="text-sm text-gray-600">Strategisch über das gesamte Revier verteilt</p>
                   </div>
                 </div>

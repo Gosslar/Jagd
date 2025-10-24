@@ -6,7 +6,7 @@ export const Footer: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-lg font-bold mb-4">Jagdrevier Waldfrieden</h3>
+            <h3 className="text-lg font-bold mb-4">Jagd Weetzen</h3>
             <p className="text-green-200 text-sm">
               Nachhaltige Jagd in naturbelassener Landschaft. 
               Tradition und Respekt vor der Natur seit über 50 Jahren.
@@ -26,10 +26,10 @@ export const Footer: React.FC = () => {
           <div>
             <h4 className="font-semibold mb-4">Kontakt</h4>
             <ul className="space-y-2 text-sm text-green-200">
-              <li>Waldstraße 123</li>
-              <li>12345 Waldfrieden</li>
+              <li>Dorfstraße 45</li>
+              <li>30900 Weetzen</li>
               <li>Tel: +49 (0) 123 456 789</li>
-              <li>info@jagdrevier-waldfrieden.de</li>
+              <li>info@jagd-weetzen.de</li>
             </ul>
           </div>
           
@@ -44,7 +44,7 @@ export const Footer: React.FC = () => {
         </div>
         
         <div className="border-t border-green-800 mt-8 pt-8 text-center text-sm text-green-200">
-          <p>&copy; 2024 Jagdrevier Waldfrieden. Alle Rechte vorbehalten.</p>
+          <p>&copy; 2024 Jagd Weetzen. Alle Rechte vorbehalten.</p>
         </div>
       </div>
     </footer>
