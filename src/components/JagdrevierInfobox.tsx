@@ -4,7 +4,7 @@ import { AlertTriangle, Car, Users, Lightbulb } from 'lucide-react';
 
 export const JagdrevierInfobox: React.FC = () => {
   return (
-    <section className="py-8 bg-gradient-to-r from-green-100 to-green-200">
+    <section className="py-8 bg-gradient-to-r from-green-200 to-green-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Card className="border-l-4 border-l-green-600 shadow-lg">
           <CardContent className="p-6">

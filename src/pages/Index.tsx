@@ -28,7 +28,7 @@ const IndexContent = () => {
   // Admin-Bereiche nur für angemeldete Administratoren anzeigen
   const showAdminAreas = user && isAdmin && !adminLoading;
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-100 to-green-200">
+    <div className="min-h-screen bg-gradient-to-br from-green-200 to-green-400">
       <Navigation />
       <Hero />
       <JagdrevierInfobox />
