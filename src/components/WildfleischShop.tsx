@@ -58,6 +58,32 @@ interface WarenkorbItem {
 export const WildfleischShop = () => {
   const { toast } = useToast();
   const { user } = useAuth();
+  
+  // Verfügbarkeitsstatus berechnen
+  const getVerfuegbarkeitsStatus = (lagerbestand: number, verfuegbar: boolean) => {
+    if (!verfuegbar || lagerbestand === 0) {
+      return {
+        status: 'Ausverkauft',
+        variant: 'destructive' as const,
+        icon: AlertTriangle,
+        className: 'text-red-600'
+      };
+    } else if (lagerbestand <= 5) { // Mindestbestand = 5
+      return {
+        status: 'Knapp',
+        variant: 'secondary' as const,
+        icon: AlertTriangle,
+        className: 'text-orange-600'
+      };
+    } else {
+      return {
+        status: 'Verfügbar',
+        variant: 'default' as const,
+        icon: CheckCircle,
+        className: 'text-green-600'
+      };
+    }
+  };
   const [kategorien, setKategorien] = useState<ShopKategorie[]>([]);
   const [produkte, setProdukte] = useState<ShopProdukt[]>([]);
   const [warenkorb, setWarenkorb] = useState<WarenkorbItem[]>([]);
@@ -399,21 +425,21 @@ export const WildfleischShop = () => {
 
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-2">
-                          {produkt.verfuegbar ? (
-                            <Badge variant="default" className="flex items-center gap-1">
-                              <CheckCircle className="h-3 w-3" />
-                              Verfügbar ({produkt.lagerbestand})
-                            </Badge>
-                          ) : (
-                            <Badge variant="destructive" className="flex items-center gap-1">
-                              <AlertTriangle className="h-3 w-3" />
-                              Ausverkauft
-                            </Badge>
-                          )}
+                          {(() => {
+                            const verfuegbarkeit = getVerfuegbarkeitsStatus(produkt.lagerbestand, produkt.verfuegbar);
+                            const IconComponent = verfuegbarkeit.icon;
+                            return (
+                              <Badge variant={verfuegbarkeit.variant} className="flex items-center gap-1">
+                                <IconComponent className="h-3 w-3" />
+                                {verfuegbarkeit.status}
+                                {verfuegbarkeit.status !== 'Ausverkauft' && ` (${produkt.lagerbestand})`}
+                              </Badge>
+                            );
+                          })()}
                         </div>
                       </div>
 
-                      {produkt.verfuegbar && (
+                      {produkt.verfuegbar && produkt.lagerbestand > 0 && (
                         <div className="space-y-3">
                           {warenkorbItem ? (
                             <div className="flex items-center gap-2">
