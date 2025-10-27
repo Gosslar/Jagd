@@ -432,7 +432,7 @@ export const WildfleischShop = () => {
                               <Badge variant={verfuegbarkeit.variant} className="flex items-center gap-1">
                                 <IconComponent className="h-3 w-3" />
                                 {verfuegbarkeit.status}
-                                {verfuegbarkeit.status !== 'Ausverkauft' && ` (${produkt.lagerbestand})`}
+                                {verfuegbarkeit.status === 'Knapp' && ` (${produkt.lagerbestand})`}
                               </Badge>
                             );
                           })()}
