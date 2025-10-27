@@ -22,7 +22,8 @@ import {
   CheckCircle,
   XCircle,
   Calendar as CalendarIcon,
-  Filter
+  Filter,
+  Download
 } from 'lucide-react';
 
 interface Veranstaltung {
@@ -115,6 +116,92 @@ export const VeranstaltungsVerwaltung = () => {
   useEffect(() => {
     loadVeranstaltungen();
   }, []);
+
+  // iCal Export Funktionen
+  const formatDateForICal = (date: string, time?: string | null) => {
+    const dateObj = new Date(date + (time ? `T${time}` : 'T00:00:00'));
+    return dateObj.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+  };
+
+  const generateICalEvent = (veranstaltung: Veranstaltung) => {
+    const startDateTime = formatDateForICal(veranstaltung.startdatum, veranstaltung.startzeit);
+    const endDateTime = veranstaltung.enddatum 
+      ? formatDateForICal(veranstaltung.enddatum, veranstaltung.endzeit)
+      : formatDateForICal(veranstaltung.startdatum, veranstaltung.endzeit || '23:59:59');
+
+    const description = [
+      veranstaltung.beschreibung,
+      veranstaltung.ort ? `Ort: ${veranstaltung.ort}` : '',
+      veranstaltung.max_teilnehmer ? `Max. Teilnehmer: ${veranstaltung.max_teilnehmer}` : '',
+      veranstaltung.anmeldung_erforderlich ? 'Anmeldung erforderlich' : '',
+      veranstaltung.anmeldeschluss ? `Anmeldeschluss: ${formatDatum(veranstaltung.anmeldeschluss)}` : '',
+      veranstaltung.notizen ? `Notizen: ${veranstaltung.notizen}` : ''
+    ].filter(Boolean).join('\\n');
+
+    return [
+      'BEGIN:VEVENT',
+      `UID:${veranstaltung.id}@jagd-weetzen.de`,
+      `DTSTART:${startDateTime}`,
+      `DTEND:${endDateTime}`,
+      `SUMMARY:${veranstaltung.titel}`,
+      `DESCRIPTION:${description}`,
+      `LOCATION:${veranstaltung.ort || ''}`,
+      `CATEGORIES:${veranstaltung.kategorie}`,
+      `STATUS:${veranstaltung.status.toUpperCase()}`,
+      `PRIORITY:${veranstaltung.prioritaet === 'kritisch' ? '1' : veranstaltung.prioritaet === 'hoch' ? '3' : veranstaltung.prioritaet === 'normal' ? '5' : '9'}`,
+      `CREATED:${formatDateForICal(veranstaltung.created_at.split('T')[0])}`,
+      `LAST-MODIFIED:${formatDateForICal(veranstaltung.updated_at.split('T')[0])}`,
+      'END:VEVENT'
+    ].join('\r\n');
+  };
+
+  const exportSingleEvent = (veranstaltung: Veranstaltung) => {
+    const icalContent = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Jagd Weetzen//Veranstaltungskalender//DE',
+      'CALSCALE:GREGORIAN',
+      'METHOD:PUBLISH',
+      generateICalEvent(veranstaltung),
+      'END:VCALENDAR'
+    ].join('\r\n');
+
+    const blob = new Blob([icalContent], { type: 'text/calendar;charset=utf-8' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `${veranstaltung.titel.replace(/[^a-zA-Z0-9]/g, '_')}.ics`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const exportAllEvents = () => {
+    const events = filteredVeranstaltungen.map(generateICalEvent).join('\r\n');
+    const icalContent = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Jagd Weetzen//Veranstaltungskalender//DE',
+      'CALSCALE:GREGORIAN',
+      'METHOD:PUBLISH',
+      'X-WR-CALNAME:Jagd Weetzen Veranstaltungen',
+      'X-WR-CALDESC:Veranstaltungskalender des Jagdreviers Weetzen',
+      events,
+      'END:VCALENDAR'
+    ].join('\r\n');
+
+    const blob = new Blob([icalContent], { type: 'text/calendar;charset=utf-8' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'Jagd_Weetzen_Veranstaltungen.ics';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    toast({
+      title: "Kalender exportiert",
+      description: `${filteredVeranstaltungen.length} Veranstaltungen wurden als iCal-Datei exportiert.`,
+    });
+  };
 
   const loadVeranstaltungen = async () => {
     try {
@@ -330,14 +417,21 @@ export const VeranstaltungsVerwaltung = () => {
               <Calendar className="h-6 w-6" />
               Veranstaltungskalender ({filteredVeranstaltungen.length})
             </CardTitle>
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-              <DialogTrigger asChild>
-                <Button onClick={() => openDialog()}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Neue Veranstaltung
+            <div className="flex gap-2">
+              {filteredVeranstaltungen.length > 0 && (
+                <Button variant="outline" onClick={exportAllEvents}>
+                  <Download className="h-4 w-4 mr-2" />
+                  Alle exportieren (.ics)
                 </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              )}
+              <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button onClick={() => openDialog()}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Neue Veranstaltung
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>
                     {editingVeranstaltung ? 'Veranstaltung bearbeiten' : 'Neue Veranstaltung'}
@@ -527,6 +621,7 @@ export const VeranstaltungsVerwaltung = () => {
               </DialogContent>
             </Dialog>
           </div>
+        </div>
         </CardHeader>
         <CardContent>
           {/* Filter */}
@@ -641,7 +736,16 @@ export const VeranstaltungsVerwaltung = () => {
                         )}
                       </div>
 
-                      <div className="flex gap-2 ml-4">
+                      <div className="flex flex-col gap-2 ml-4">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => exportSingleEvent(veranstaltung)}
+                          title="Als iCal exportieren"
+                        >
+                          <Download className="h-4 w-4" />
+                        </Button>
+                        <div className="flex gap-2">
                         <Button
                           variant="outline"
                           size="sm"
@@ -656,6 +760,7 @@ export const VeranstaltungsVerwaltung = () => {
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
+                        </div>
                       </div>
                     </div>
                   </CardContent>
