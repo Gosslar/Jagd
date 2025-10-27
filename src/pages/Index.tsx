@@ -16,6 +16,7 @@ import { ShopBestellVerwaltung } from '@/components/ShopBestellVerwaltung';
 import { BenutzerVerwaltung } from '@/components/BenutzerVerwaltung';
 import { BlogVerwaltungSimple } from '@/components/BlogVerwaltungSimple';
 import { KontaktVerwaltung } from '@/components/KontaktVerwaltung';
+import { VeranstaltungsVerwaltung } from '@/components/VeranstaltungsVerwaltung';
 import { useAdminStatus } from '@/hooks/useAdminStatus';
 import { Toaster } from '@/components/ui/toaster';
 
@@ -42,6 +43,7 @@ const IndexContent = () => {
         <>
           <ShopVerwaltung />
           <ShopBestellVerwaltung />
+          <VeranstaltungsVerwaltung />
           <BlogVerwaltungSimple />
           <KontaktVerwaltung />
           <BenutzerVerwaltung />
