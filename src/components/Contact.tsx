@@ -129,7 +129,6 @@ export const Contact: React.FC = () => {
                   </div>
                   <div>
                     <h4 className="font-medium">Ole Gosslar</h4>
-                    <p className="text-sm text-gray-600">Revierpächter</p>
                     <p className="text-sm text-gray-600">Am Denkmal 16</p>
                     <p className="text-sm text-gray-600">30952 Linderte</p>
                   </div>
