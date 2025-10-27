@@ -14,7 +14,7 @@ export const Hero: React.FC = () => {
           Jagd Weetzen
         </h1>
         <p className="text-xl md:text-2xl mb-8 leading-relaxed font-medium text-shadow drop-shadow-lg">
-          Erleben Sie nachhaltige Jagd in 340 Hektar naturbelassener Wald- und Feldlandschaft. 
+          Erleben Sie nachhaltige Jagd in 340 Hektar naturbelassener Wiesen- und Feldlandschaft. 
           Tradition, Respekt vor der Natur und verantwortungsvolle Hege stehen im Mittelpunkt 
           unserer jagdlichen Aktivitäten.
         </p>

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from './AuthProvider';
+import { useAuth } from '@/contexts/AuthProvider';
 import { Lock, Camera } from 'lucide-react';
 
 interface GalleryItem {

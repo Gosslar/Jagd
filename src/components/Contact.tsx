@@ -29,15 +29,29 @@ export const Contact: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    
     try {
-      const {
-        error
-      } = await supabase.from('contact_requests_2025_10_23_06_04').insert([formData]);
-      if (error) throw error;
+      // Speichere Kontaktanfrage direkt in der Datenbank
+      const { data, error } = await supabase
+        .from('kontaktanfragen_2025_10_26_12_00')
+        .insert([{
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone || null,
+          subject: formData.subject,
+          message: formData.message
+        }]);
+
+      if (error) {
+        console.error('Database error:', error);
+        throw new Error(error.message || 'Fehler beim Speichern der Nachricht');
+      }
+
       toast({
-        title: "Nachricht gesendet",
-        description: "Vielen Dank für Ihre Nachricht. Wir werden uns bald bei Ihnen melden."
+        title: "Nachricht gespeichert",
+        description: "Vielen Dank für Ihre Nachricht. Wir haben sie erhalten und werden uns bald bei Ihnen melden."
       });
+      
       setFormData({
         name: '',
         email: '',
@@ -46,9 +60,19 @@ export const Contact: React.FC = () => {
         message: ''
       });
     } catch (error: any) {
+      console.error('Error details:', error);
+      
+      let errorMessage = "Ein unbekannter Fehler ist aufgetreten";
+      
+      if (error.message) {
+        errorMessage = error.message;
+      } else if (typeof error === 'string') {
+        errorMessage = error;
+      }
+      
       toast({
         title: "Fehler beim Senden",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {

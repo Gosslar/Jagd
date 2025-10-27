@@ -26,9 +26,9 @@ export const Footer: React.FC = () => {
           <div>
             <h4 className="font-semibold mb-4">Kontakt</h4>
             <ul className="space-y-2 text-sm text-green-200">
-              <li>Dorfstraße 45</li>
-              <li>30900 Weetzen</li>
-              <li>Tel: +49 (0) 123 456 789</li>
+              <li>Am Denkmal 16</li>
+              <li>30952 Linderte</li>
+              <li>Tel: +49 172 5265166</li>
               <li>info@jagd-weetzen.de</li>
             </ul>
           </div>

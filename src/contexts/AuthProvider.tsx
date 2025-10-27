@@ -7,9 +7,11 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  isApproved: boolean;
   signUp: (email: string, password: string, userData?: { full_name?: string }) => Promise<{ data: any; error: any }>;
   signIn: (email: string, password: string) => Promise<{ data: any; error: any }>;
   signOut: () => Promise<void>;
+  checkApprovalStatus: () => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -26,6 +28,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isApproved, setIsApproved] = useState(false);
+
+  const checkApprovalStatus = async (): Promise<boolean> => {
+    if (!user) return false;
+    
+    try {
+      const { data, error } = await supabase
+        .from('user_profiles_2025_10_25_19_00')
+        .select('freigabe_status')
+        .eq('user_id', user.id)
+        .single();
+
+      if (error) {
+        console.error('Error checking approval status:', error);
+        // Wenn Profil nicht existiert, als freigegeben behandeln
+        setIsApproved(true);
+        return true;
+      }
+
+      const approved = data?.freigabe_status === 'freigegeben';
+      setIsApproved(approved);
+      return approved;
+    } catch (error) {
+      console.error('Error checking approval status:', error);
+      // Bei Fehlern als freigegeben behandeln
+      setIsApproved(true);
+      return true;
+    }
+  };
 
   useEffect(() => {
     // Set up auth state listener
@@ -33,14 +64,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       async (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          await checkApprovalStatus();
+        } else {
+          setIsApproved(false);
+        }
+        
         setLoading(false);
       }
     );
 
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+      
+      if (session?.user) {
+        await checkApprovalStatus();
+      }
+      
       setLoading(false);
     });
 
@@ -62,7 +105,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       toast({
         title: "Registrierung erfolgreich",
-        description: "Bitte überprüfen Sie Ihre E-Mail und klicken Sie auf den Bestätigungslink.",
+        description: "Bitte bestätigen Sie Ihre E-Mail-Adresse. Ihr Konto muss anschließend von einem Administrator freigegeben werden.",
       });
 
       return { data, error: null };
@@ -123,9 +166,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     user,
     session,
     loading,
+    isApproved,
     signUp,
     signIn,
     signOut,
+    checkApprovalStatus,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

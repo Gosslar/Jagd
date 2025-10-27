@@ -10,28 +10,69 @@ export const Praedatorenmanagement: React.FC = () => {
       threat: 'Hoch',
       target: 'Niederwild, Bodenbrüter',
       methods: 'Fallenjagd, Ansitzjagd',
-      season: 'Ganzjährig'
+      season: 'Ganzjährig',
+      images: [
+        '/images/fuchs_praedator_1.jpeg',
+        '/images/fuchs_praedator_2.jpeg',
+        '/images/fuchs_praedator_3.jpeg'
+      ]
     },
     {
       name: 'Waschbär',
       threat: 'Sehr Hoch',
       target: 'Gelege, Jungvögel',
       methods: 'Lebendfallen, Jagd',
-      season: 'Ganzjährig'
+      season: 'Ganzjährig',
+      images: [
+        '/images/waschbaer_praedator_1.jpeg',
+        '/images/waschbaer_praedator_2.jpeg',
+        '/images/waschbaer_praedator_3.jpeg'
+      ]
     },
     {
-      name: 'Marderhund',
+      name: 'Dachs',
       threat: 'Mittel',
-      target: 'Bodenbrüter, Amphibien',
-      methods: 'Fallenjagd, Jagd',
-      season: 'Oktober - Februar'
+      target: 'Bodenbrüter, Gelege',
+      methods: 'Fallenjagd, Baujagd',
+      season: 'August - Januar',
+      images: [
+        '/images/dachs_praedator_1.jpeg',
+        '/images/dachs_praedator_2.jpeg'
+      ]
     },
     {
       name: 'Steinmarder',
       threat: 'Mittel',
       target: 'Kleinvögel, Eier',
       methods: 'Fallenjagd',
-      season: 'Juli - Februar'
+      season: 'Juli - Februar',
+      images: [
+        '/images/marder_praedator_2.jpeg',
+        '/images/marder_praedator_1.png'
+      ]
+    },
+    {
+      name: 'Baummarder',
+      threat: 'Mittel',
+      target: 'Eichhörnchen, Vögel, Eier',
+      methods: 'Fallenjagd, Ansitzjagd',
+      season: 'Juli - Februar',
+      images: [
+        '/images/marder_praedator_4.jpeg',
+        '/images/marder_praedator_3.webp'
+      ]
+    },
+    {
+      name: 'Nutria',
+      threat: 'Hoch',
+      target: 'Ufervegetation, Wasserpflanzen',
+      methods: 'Fallenjagd, Lebendfallen',
+      season: 'Ganzjährig',
+      images: [
+        '/images/nutria_praedator_1.jpeg',
+        '/images/nutria_praedator_2.jpeg',
+        '/images/nutria_praedator_3.jpeg'
+      ]
     }
   ];
 
@@ -64,7 +105,7 @@ export const Praedatorenmanagement: React.FC = () => {
               <Target className="h-4 w-4 text-red-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">127</div>
+              <div className="text-2xl font-bold">67</div>
               <p className="text-xs text-muted-foreground">Entnommene Prädatoren</p>
             </CardContent>
           </Card>
@@ -86,7 +127,7 @@ export const Praedatorenmanagement: React.FC = () => {
               <Shield className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">24</div>
+              <div className="text-2xl font-bold">diverse</div>
               <p className="text-xs text-muted-foreground">Strategisch platziert</p>
             </CardContent>
           </Card>
@@ -125,7 +166,22 @@ export const Praedatorenmanagement: React.FC = () => {
           <h3 className="text-2xl font-bold text-gray-900 mb-6">Hauptprädatoren in unserem Revier</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {predators.map((predator, index) => (
-              <Card key={index}>
+              <Card key={index} className="overflow-hidden">
+                {/* Bildergalerie */}
+                {predator.images && predator.images.length > 0 && (
+                  <div className="aspect-video relative">
+                    <img 
+                      src={predator.images[0]} 
+                      alt={predator.name}
+                      className="w-full h-full object-cover"
+                    />
+                    {predator.images.length > 1 && (
+                      <div className="absolute bottom-2 right-2 bg-black bg-opacity-60 text-white text-xs px-2 py-1 rounded">
+                        +{predator.images.length - 1} weitere
+                      </div>
+                    )}
+                  </div>
+                )}
                 <CardHeader>
                   <div className="flex justify-between items-start">
                     <CardTitle className="text-lg">{predator.name}</CardTitle>
@@ -148,6 +204,22 @@ export const Praedatorenmanagement: React.FC = () => {
                       <span className="font-medium text-sm">Jagdzeit:</span>
                       <Badge variant="outline" className="text-xs">{predator.season}</Badge>
                     </div>
+                    
+                    {/* Zusätzliche Bilder als kleine Thumbnails */}
+                    {predator.images && predator.images.length > 1 && (
+                      <div className="pt-2 border-t">
+                        <div className="flex gap-2 overflow-x-auto">
+                          {predator.images.slice(1).map((image, imgIndex) => (
+                            <img 
+                              key={imgIndex}
+                              src={image} 
+                              alt={`${predator.name} ${imgIndex + 2}`}
+                              className="w-12 h-12 object-cover rounded flex-shrink-0"
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -185,7 +257,7 @@ export const Praedatorenmanagement: React.FC = () => {
                 <div>
                   <h4 className="font-medium">Fallenjagd</h4>
                   <p className="text-sm text-gray-600">
-                    Lebendfallen und Totschlagfallen nach gesetzlichen Vorgaben
+                    Ausschließlich Lebendfallen im Einsatz nach gesetzlichen Vorgaben
                   </p>
                 </div>
               </div>
@@ -238,16 +310,11 @@ export const Praedatorenmanagement: React.FC = () => {
             <CardTitle>Erfolge des Prädatorenmanagements</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="text-center p-4 bg-green-50 rounded-lg">
                 <div className="text-3xl font-bold text-green-600 mb-2">+35%</div>
                 <h4 className="font-medium mb-1">Rebhuhnbestand</h4>
                 <p className="text-sm text-gray-600">Zunahme seit Programmbeginn</p>
-              </div>
-              <div className="text-center p-4 bg-blue-50 rounded-lg">
-                <div className="text-3xl font-bold text-blue-600 mb-2">+28%</div>
-                <h4 className="font-medium mb-1">Fasanenbestand</h4>
-                <p className="text-sm text-gray-600">Erfolgreiche Bruten 2024</p>
               </div>
               <div className="text-center p-4 bg-purple-50 rounded-lg">
                 <div className="text-3xl font-bold text-purple-600 mb-2">+42%</div>
@@ -259,40 +326,7 @@ export const Praedatorenmanagement: React.FC = () => {
         </Card>
 
         {/* Team and Training */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
-                Unser Team
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <h4 className="font-medium">Prädatorenbeauftragte</h4>
-                  <p className="text-sm text-gray-600">
-                    Speziell ausgebildete Jäger koordinieren alle Maßnahmen 
-                    und überwachen die Fallenstrecken.
-                  </p>
-                </div>
-                <div>
-                  <h4 className="font-medium">Fallenstellerteam</h4>
-                  <p className="text-sm text-gray-600">
-                    8 zertifizierte Fallensteller betreuen 24 Fallen 
-                    im gesamten Revier.
-                  </p>
-                </div>
-                <div>
-                  <h4 className="font-medium">Monitoring-Gruppe</h4>
-                  <p className="text-sm text-gray-600">
-                    Wildkamera-Überwachung und Bestandserfassung 
-                    durch erfahrene Reviermitglieder.
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="grid grid-cols-1 gap-8">
 
           <Card>
             <CardHeader>
