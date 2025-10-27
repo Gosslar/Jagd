@@ -4,13 +4,13 @@ import { AlertTriangle, Car, Users, Lightbulb } from 'lucide-react';
 
 export const JagdrevierInfobox: React.FC = () => {
   return (
-    <section className="py-8 bg-gradient-to-r from-amber-50 to-orange-50">
+    <section className="py-8 bg-gradient-to-r from-green-100 to-green-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <Card className="border-l-4 border-l-amber-500 shadow-lg">
+        <Card className="border-l-4 border-l-green-600 shadow-lg">
           <CardContent className="p-6">
             <div className="flex items-start gap-4">
               <div className="flex-shrink-0">
-                <AlertTriangle className="h-8 w-8 text-amber-600" />
+                <AlertTriangle className="h-8 w-8 text-green-700" />
               </div>
               <div className="flex-1">
                 <h3 className="text-xl font-bold text-gray-900 mb-4">
@@ -26,9 +26,9 @@ export const JagdrevierInfobox: React.FC = () => {
                     Gleichzeitig sorgt der wachsende Freizeitdruck durch die Stadtbevölkerung für ständige Beunruhigung. Aktivitäten wie freilaufende Hunde oder das Verlassen der Wege stören die Wildtiere, schränken ihren Lebensraum ein und drängen sie in riskantere Gebiete nahe der Straßen.
                   </p>
                   
-                  <div className="bg-white rounded-lg p-4 border border-amber-200">
+                  <div className="bg-white rounded-lg p-4 border border-green-200">
                     <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                      <Lightbulb className="h-5 w-5 text-amber-600" />
+                      <Lightbulb className="h-5 w-5 text-green-700" />
                       Ein gemeinsames Handeln ist erforderlich. Wichtige Lösungsansätze sind:
                     </h4>
                     
