@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthProvider';
+import jsPDF from 'jspdf';
 import { 
   Package, 
   CheckCircle, 
@@ -112,203 +113,172 @@ export const ShopBestellVerwaltung = () => {
     }
   };
 
-  // Lieferschein generieren und herunterladen
+  // Lieferschein als PDF generieren und herunterladen
   const generateLieferschein = (bestellung: ShopBestellung) => {
     const positionen = bestellpositionen[bestellung.id] || [];
     const datum = new Date().toLocaleDateString('de-DE');
     const abholdatum = new Date(bestellung.abholung_datum).toLocaleDateString('de-DE');
     
-    // Template-Strings für bessere Lesbarkeit aufteilen
-    const kundenTelefon = bestellung.kunde_telefon ? `Tel: ${bestellung.kunde_telefon}<br>` : '';
-    const kundenNotiz = bestellung.abholung_notiz ? `
-    <div style="margin: 20px 0; padding: 15px; background-color: #f0f8ff; border-left: 4px solid #2d5016;">
-        <strong>Kundennotiz:</strong><br>
-        ${bestellung.abholung_notiz}
-    </div>
-    ` : '';
-    const adminNotiz = bestellung.admin_notiz ? `
-    <div style="margin: 20px 0; padding: 15px; background-color: #fff8dc; border-left: 4px solid #ffa500;">
-        <strong>Interne Notiz:</strong><br>
-        ${bestellung.admin_notiz}
-    </div>
-    ` : '';
+    // PDF erstellen
+    const doc = new jsPDF();
     
-    const positionenRows = positionen.map((position, index) => `
-                <tr>
-                    <td>${index + 1}</td>
-                    <td>${position.produkt_name}</td>
-                    <td>${position.menge}</td>
-                    <td>${position.einzelpreis.toFixed(2)}€</td>
-                    <td>${position.gesamtpreis.toFixed(2)}€</td>
-                </tr>
-            `).join('');
+    // Schriftarten und Farben definieren
+    const primaryColor = [45, 80, 22]; // Jagdgrün #2d5016
+    const textColor = [0, 0, 0];
     
-    const lieferscheinContent = `<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lieferschein ${bestellung.bestellnummer}</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            line-height: 1.6;
-        }
-        .header {
-            text-align: center;
-            border-bottom: 2px solid #2d5016;
-            padding-bottom: 20px;
-            margin-bottom: 30px;
-        }
-        .company-name {
-            font-size: 24px;
-            font-weight: bold;
-            color: #2d5016;
-            margin-bottom: 10px;
-        }
-        .document-title {
-            font-size: 20px;
-            font-weight: bold;
-            margin: 20px 0;
-        }
-        .info-section {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 30px;
-        }
-        .info-box {
-            width: 45%;
-        }
-        .info-box h3 {
-            color: #2d5016;
-            border-bottom: 1px solid #2d5016;
-            padding-bottom: 5px;
-        }
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-        .table th, .table td {
-            border: 1px solid #ddd;
-            padding: 12px;
-            text-align: left;
-        }
-        .table th {
-            background-color: #2d5016;
-            color: white;
-        }
-        .table tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-        .total-row {
-            font-weight: bold;
-            background-color: #e8f5e8 !important;
-        }
-        .footer {
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #ddd;
-            text-align: center;
-            color: #666;
-            font-size: 12px;
-        }
-        .signature-section {
-            margin-top: 40px;
-            display: flex;
-            justify-content: space-between;
-        }
-        .signature-box {
-            width: 45%;
-            border-top: 1px solid #000;
-            padding-top: 10px;
-            text-align: center;
-        }
-        @media print {
-            body { margin: 0; padding: 15px; }
-            .no-print { display: none; }
-        }
-    </style>
-</head>
-<body>
-    <div class="header">
-        <div class="company-name">Jagd Weetzen</div>
-        <div>Am Denkmal 16 • 30952 Linderte</div>
-        <div>Tel: +49 172 5265166 • info@jagd-weetzen.de</div>
-    </div>
-
-    <div class="document-title">LIEFERSCHEIN</div>
-
-    <div class="info-section">
-        <div class="info-box">
-            <h3>Lieferadresse</h3>
-            <strong>${bestellung.kunde_name}</strong><br>
-            E-Mail: ${bestellung.kunde_email}<br>
-            ${kundenTelefon}
-        </div>
-        <div class="info-box">
-            <h3>Lieferschein-Details</h3>
-            <strong>Lieferschein-Nr.:</strong> LS-${bestellung.bestellnummer}<br>
-            <strong>Bestellnummer:</strong> ${bestellung.bestellnummer}<br>
-            <strong>Datum:</strong> ${datum}<br>
-            <strong>Abholung:</strong> ${abholdatum} um ${bestellung.abholung_uhrzeit}<br>
-            <strong>Status:</strong> ${getStatusLabel(bestellung.status)}
-        </div>
-    </div>
-
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Pos.</th>
-                <th>Artikel</th>
-                <th>Menge</th>
-                <th>Einzelpreis</th>
-                <th>Gesamtpreis</th>
-            </tr>
-        </thead>
-        <tbody>
-            ${positionenRows}
-            <tr class="total-row">
-                <td colspan="4"><strong>Gesamtsumme</strong></td>
-                <td><strong>${bestellung.gesamtpreis.toFixed(2)}€</strong></td>
-            </tr>
-        </tbody>
-    </table>
-
-    ${kundenNotiz}
-    ${adminNotiz}
-
-    <div class="signature-section">
-        <div class="signature-box">
-            <div>Datum, Unterschrift Kunde</div>
-        </div>
-        <div class="signature-box">
-            <div>Datum, Unterschrift Jagd Weetzen</div>
-        </div>
-    </div>
-
-    <div class="footer">
-        <p>Vielen Dank für Ihr Vertrauen in unsere Wildfleisch-Produkte!</p>
-        <p>Jagd Weetzen • Am Denkmal 16 • 30952 Linderte • Tel: +49 172 5265166</p>
-    </div>
-</body>
-</html>`;
-
-    // HTML-Datei erstellen und herunterladen
-    const blob = new Blob([lieferscheinContent], { type: 'text/html;charset=utf-8' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `Lieferschein_${bestellung.bestellnummer}_${datum.replace(/\./g, '-')}.html`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
+    // Header
+    doc.setFontSize(24);
+    doc.setTextColor(...primaryColor);
+    doc.text('Jagd Weetzen', 105, 25, { align: 'center' });
+    
+    doc.setFontSize(10);
+    doc.setTextColor(...textColor);
+    doc.text('Am Denkmal 16 • 30952 Linderte', 105, 32, { align: 'center' });
+    doc.text('Tel: +49 172 5265166 • info@jagd-weetzen.de', 105, 37, { align: 'center' });
+    
+    // Linie unter Header
+    doc.setDrawColor(...primaryColor);
+    doc.setLineWidth(1);
+    doc.line(20, 42, 190, 42);
+    
+    // Dokumenttitel
+    doc.setFontSize(18);
+    doc.setTextColor(...primaryColor);
+    doc.text('LIEFERSCHEIN', 105, 55, { align: 'center' });
+    
+    // Lieferadresse (links)
+    doc.setFontSize(12);
+    doc.setTextColor(...primaryColor);
+    doc.text('Lieferadresse', 20, 70);
+    
+    doc.setFontSize(10);
+    doc.setTextColor(...textColor);
+    doc.text(bestellung.kunde_name, 20, 78);
+    doc.text(`E-Mail: ${bestellung.kunde_email}`, 20, 84);
+    if (bestellung.kunde_telefon) {
+      doc.text(`Tel: ${bestellung.kunde_telefon}`, 20, 90);
+    }
+    
+    // Lieferschein-Details (rechts)
+    doc.setFontSize(12);
+    doc.setTextColor(...primaryColor);
+    doc.text('Lieferschein-Details', 120, 70);
+    
+    doc.setFontSize(10);
+    doc.setTextColor(...textColor);
+    doc.text(`Lieferschein-Nr.: LS-${bestellung.bestellnummer}`, 120, 78);
+    doc.text(`Bestellnummer: ${bestellung.bestellnummer}`, 120, 84);
+    doc.text(`Datum: ${datum}`, 120, 90);
+    doc.text(`Abholung: ${abholdatum} um ${bestellung.abholung_uhrzeit}`, 120, 96);
+    doc.text(`Status: ${getStatusLabel(bestellung.status)}`, 120, 102);
+    
+    // Tabelle Header
+    let yPos = 120;
+    doc.setFillColor(...primaryColor);
+    doc.rect(20, yPos, 170, 8, 'F');
+    
+    doc.setFontSize(10);
+    doc.setTextColor(255, 255, 255);
+    doc.text('Pos.', 22, yPos + 5);
+    doc.text('Artikel', 35, yPos + 5);
+    doc.text('Menge', 120, yPos + 5);
+    doc.text('Einzelpreis', 140, yPos + 5);
+    doc.text('Gesamtpreis', 165, yPos + 5);
+    
+    // Tabelle Inhalt
+    yPos += 10;
+    doc.setTextColor(...textColor);
+    
+    positionen.forEach((position, index) => {
+      // Zebrastreifen
+      if (index % 2 === 0) {
+        doc.setFillColor(249, 249, 249);
+        doc.rect(20, yPos - 2, 170, 8, 'F');
+      }
+      
+      doc.text((index + 1).toString(), 22, yPos + 3);
+      doc.text(position.produkt_name, 35, yPos + 3);
+      doc.text(position.menge.toString(), 120, yPos + 3);
+      doc.text(`${position.einzelpreis.toFixed(2)}€`, 140, yPos + 3);
+      doc.text(`${position.gesamtpreis.toFixed(2)}€`, 165, yPos + 3);
+      
+      yPos += 8;
+    });
+    
+    // Gesamtsumme
+    doc.setFillColor(232, 245, 232);
+    doc.rect(20, yPos, 170, 8, 'F');
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'bold');
+    doc.text('Gesamtsumme', 120, yPos + 5);
+    doc.text(`${bestellung.gesamtpreis.toFixed(2)}€`, 165, yPos + 5);
+    doc.setFont(undefined, 'normal');
+    
+    yPos += 15;
+    
+    // Kundennotiz
+    if (bestellung.abholung_notiz) {
+      doc.setFillColor(240, 248, 255);
+      doc.rect(20, yPos, 170, 20, 'F');
+      doc.setDrawColor(45, 80, 22);
+      doc.setLineWidth(2);
+      doc.line(20, yPos, 20, yPos + 20);
+      
+      doc.setFontSize(10);
+      doc.setFont(undefined, 'bold');
+      doc.text('Kundennotiz:', 25, yPos + 8);
+      doc.setFont(undefined, 'normal');
+      
+      // Text umbrechen
+      const splitText = doc.splitTextToSize(bestellung.abholung_notiz, 160);
+      doc.text(splitText, 25, yPos + 14);
+      yPos += 25;
+    }
+    
+    // Admin-Notiz
+    if (bestellung.admin_notiz) {
+      doc.setFillColor(255, 248, 220);
+      doc.rect(20, yPos, 170, 20, 'F');
+      doc.setDrawColor(255, 165, 0);
+      doc.setLineWidth(2);
+      doc.line(20, yPos, 20, yPos + 20);
+      
+      doc.setFontSize(10);
+      doc.setFont(undefined, 'bold');
+      doc.text('Interne Notiz:', 25, yPos + 8);
+      doc.setFont(undefined, 'normal');
+      
+      // Text umbrechen
+      const splitText = doc.splitTextToSize(bestellung.admin_notiz, 160);
+      doc.text(splitText, 25, yPos + 14);
+      yPos += 25;
+    }
+    
+    // Unterschriftenfelder
+    yPos = Math.max(yPos + 20, 240);
+    doc.setDrawColor(0, 0, 0);
+    doc.setLineWidth(0.5);
+    doc.line(20, yPos, 90, yPos);
+    doc.line(120, yPos, 190, yPos);
+    
+    doc.setFontSize(9);
+    doc.text('Datum, Unterschrift Kunde', 55, yPos + 8, { align: 'center' });
+    doc.text('Datum, Unterschrift Jagd Weetzen', 155, yPos + 8, { align: 'center' });
+    
+    // Footer
+    yPos += 25;
+    doc.setFontSize(8);
+    doc.setTextColor(102, 102, 102);
+    doc.text('Vielen Dank für Ihr Vertrauen in unsere Wildfleisch-Produkte!', 105, yPos, { align: 'center' });
+    doc.text('Jagd Weetzen • Am Denkmal 16 • 30952 Linderte • Tel: +49 172 5265166', 105, yPos + 5, { align: 'center' });
+    
+    // PDF speichern
+    const fileName = `Lieferschein_${bestellung.bestellnummer}_${datum.replace(/\./g, '-')}.pdf`;
+    doc.save(fileName);
+    
     toast({
       title: "Lieferschein erstellt",
-      description: `Lieferschein für Bestellung ${bestellung.bestellnummer} wurde heruntergeladen.`,
+      description: `PDF-Lieferschein für Bestellung ${bestellung.bestellnummer} wurde heruntergeladen.`,
     });
   };
 
