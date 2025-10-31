@@ -97,8 +97,8 @@ export const ShopBestellVerwaltung = () => {
         status: (order.status === 'neu' ? 'neu' : 
                 order.status === 'freigegeben' ? 'bestaetigt' : 
                 order.status === 'abgelehnt' ? 'storniert' : 'neu') as any,
-        zahlungsart: 'bar',
-        zahlungsstatus: 'offen' as any,
+        zahlungsart: order.zahlungsart || 'bar',
+        zahlungsstatus: (order.zahlungsstatus || 'offen') as any,
         admin_notiz: '',
         bearbeitet_von: '',
         bearbeitet_am: '',
@@ -381,14 +381,17 @@ export const ShopBestellVerwaltung = () => {
     }
   };
 
-  const updateZahlungsstatus = async (bestellungId: string, newStatus: string) => {
+
+
+  const updateZahlungsstatus = async (bestellungId: string, newZahlungsstatus: string) => {
     try {
+      console.log('Aktualisiere Zahlungsstatus für Bestellung:', bestellungId, 'zu:', newZahlungsstatus);
+      
       const { error } = await supabase
-        .from('shop_bestellungen_2025_10_27_14_00')
-        .update({
-          zahlungsstatus: newStatus,
-          bearbeitet_von: user?.id,
-          bearbeitet_am: new Date().toISOString()
+        .from('simple_bestellungen_2025_10_31_12_00')
+        .update({ 
+          zahlungsstatus: newZahlungsstatus,
+          zahlungsstatus_geaendert_am: new Date().toISOString()
         })
         .eq('id', bestellungId);
       
@@ -396,11 +399,12 @@ export const ShopBestellVerwaltung = () => {
       
       toast({
         title: "Zahlungsstatus aktualisiert",
-        description: "Zahlung wurde auf " + getZahlungsstatusLabel(newStatus) + " gesetzt.",
+        description: `Zahlungsstatus wurde auf ${getZahlungsstatusLabel(newZahlungsstatus)} gesetzt.`,
       });
       
       loadBestellungen();
     } catch (error: any) {
+      console.error('Fehler beim Aktualisieren des Zahlungsstatus:', error);
       toast({
         title: "Fehler beim Aktualisieren",
         description: error.message,
@@ -420,6 +424,10 @@ export const ShopBestellVerwaltung = () => {
     return labels[status] || status;
   };
 
+
+
+
+
   const getStatusVariant = (status: string) => {
     const variants: { [key: string]: "default" | "secondary" | "destructive" | "outline" } = {
       'neu': 'outline',
@@ -431,7 +439,7 @@ export const ShopBestellVerwaltung = () => {
     return variants[status] || 'outline';
   };
 
-  const getZahlungsstatusLabel = (status: string) => {
+const getZahlungsstatusLabel = (status: string) => {
     const labels: { [key: string]: string } = {
       'offen': 'Offen',
       'bezahlt': 'Bezahlt',
@@ -449,7 +457,7 @@ export const ShopBestellVerwaltung = () => {
     return variants[status] || 'outline';
   };
 
-  const openDetailDialog = (bestellung: ShopBestellung) => {
+const openDetailDialog = (bestellung: ShopBestellung) => {
     setSelectedBestellung(bestellung);
     setAdminNotiz(bestellung.admin_notiz || '');
     setDetailDialog(true);
@@ -601,6 +609,15 @@ export const ShopBestellVerwaltung = () => {
                           >
                             <Eye className="h-4 w-4 mr-1" />
                             Details
+                          </Button>
+                          
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => generateLieferschein(bestellung)}
+                          >
+                            <Download className="h-4 w-4 mr-1" />
+                            PDF
                           </Button>
                         </div>
                         
