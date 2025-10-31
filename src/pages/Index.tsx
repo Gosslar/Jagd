@@ -17,6 +17,7 @@ import { ShopVerwaltung } from '@/components/ShopVerwaltung';
 import { ShopBestellVerwaltung } from '@/components/ShopBestellVerwaltung';
 import { BenutzerVerwaltung } from '@/components/BenutzerVerwaltung';
 import { ErweiterteBenutzerverwaltung } from '@/components/ErweiterteBenutzerverwaltung';
+import { AdminStatusDebug } from '@/components/AdminStatusDebug';
 import { BlogVerwaltungSimple } from '@/components/BlogVerwaltungSimple';
 import { KontaktVerwaltung } from '@/components/KontaktVerwaltung';
 import { VeranstaltungsVerwaltung } from '@/components/VeranstaltungsVerwaltung';
@@ -42,6 +43,9 @@ const IndexContent = () => {
       <Rehkitzrettung />
       <WildfleischShop />
       <Contact />
+      
+      {/* Debug-Komponente */}
+      <AdminStatusDebug />
       
       {/* Admin-Bereiche - NUR für angemeldete Administratoren */}
       {showAdminAreas && (
