@@ -230,14 +230,6 @@ export const WildfleischShop = () => {
 
   // Checkout-Funktionen
   const submitBestellung = async () => {
-    if (!user) {
-      toast({
-        title: "Anmeldung erforderlich",
-        description: "Bitte melden Sie sich an, um eine Bestellung aufzugeben.",
-        variant: "destructive",
-      });
-      return;
-    }
 
     if (warenkorb.length === 0) {
       toast({
@@ -262,7 +254,7 @@ export const WildfleischShop = () => {
       const { data: bestellung, error: bestellungError } = await supabase
         .from('shop_bestellungen_2025_10_27_14_00')
         .insert({
-          kunde_id: user.id,
+          kunde_id: user?.id || null,
           kunde_name: checkoutForm.kunde_name,
           kunde_email: checkoutForm.kunde_email,
           kunde_telefon: checkoutForm.kunde_telefon,
