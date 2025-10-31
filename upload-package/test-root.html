@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React-Container Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-result {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 5px solid;
+        }
+        .success {
+            background-color: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        .info {
+            background-color: #d1ecf1;
+            border-color: #17a2b8;
+            color: #0c5460;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 3px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 React-Container Test</h1>
+    
+    <div id="test-results"></div>
+    
+    <div style="margin: 20px 0;">
+        <button onclick="runTests()">🔄 Tests erneut ausführen</button>
+        <button onclick="createTestRoot()">➕ Test-Root erstellen</button>
+        <button onclick="window.location.href='/'">🏠 Zur Hauptseite</button>
+    </div>
+    
+    <div id="test-root-container" style="margin-top: 30px;">
+        <h3>Test-Root-Container:</h3>
+        <div id="test-root" style="border: 2px dashed #ccc; padding: 20px; min-height: 100px;">
+            <!-- Hier wird der Test-Root erstellt -->
+        </div>
+    </div>
+
+    <script>
+        function addTestResult(type, title, message, details = null) {
+            const container = document.getElementById('test-results');
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            
+            let content = `<strong>${title}</strong><p>${message}</p>`;
+            if (details) {
+                content += `<pre>${JSON.stringify(details, null, 2)}</pre>`;
+            }
+            
+            div.innerHTML = content;
+            container.appendChild(div);
+        }
+
+        function clearResults() {
+            document.getElementById('test-results').innerHTML = '';
+        }
+
+        function runTests() {
+            clearResults();
+            
+            // Test 1: DOM-Bereitschaft
+            addTestResult('info', '📋 Test 1: DOM-Status', `Document Ready State: ${document.readyState}`);
+            
+            // Test 2: Root-Element suchen
+            const rootElement = document.getElementById('root');
+            if (rootElement) {
+                addTestResult('success', '✅ Test 2: Root-Element', 'Root-Element (#root) gefunden', {
+                    tagName: rootElement.tagName,
+                    id: rootElement.id,
+                    children: rootElement.children.length,
+                    innerHTML: rootElement.innerHTML.substring(0, 100) + '...'
+                });
+            } else {
+                addTestResult('error', '❌ Test 2: Root-Element', 'Root-Element (#root) NICHT gefunden!');
+            }
+            
+            // Test 3: Body-Element
+            if (document.body) {
+                addTestResult('success', '✅ Test 3: Body-Element', 'Body-Element gefunden', {
+                    children: document.body.children.length,
+                    bodyContent: Array.from(document.body.children).map(el => el.tagName + (el.id ? '#' + el.id : ''))
+                });
+            } else {
+                addTestResult('error', '❌ Test 3: Body-Element', 'Body-Element NICHT gefunden!');
+            }
+            
+            // Test 4: JavaScript-Funktionalität
+            try {
+                const testDiv = document.createElement('div');
+                testDiv.id = 'js-test';
+                testDiv.innerHTML = 'JavaScript funktioniert!';
+                
+                addTestResult('success', '✅ Test 4: JavaScript', 'JavaScript-Funktionalität bestätigt', {
+                    createElement: typeof document.createElement,
+                    getElementById: typeof document.getElementById,
+                    addEventListener: typeof document.addEventListener
+                });
+            } catch (error) {
+                addTestResult('error', '❌ Test 4: JavaScript', `JavaScript-Fehler: ${error.message}`);
+            }
+            
+            // Test 5: React-Module Test
+            try {
+                // Simuliere React-Import Test
+                const moduleSupport = typeof import !== 'undefined';
+                addTestResult(moduleSupport ? 'success' : 'error', 
+                    moduleSupport ? '✅ Test 5: Module-Support' : '❌ Test 5: Module-Support', 
+                    moduleSupport ? 'ES6-Module werden unterstützt' : 'ES6-Module werden NICHT unterstützt');
+            } catch (error) {
+                addTestResult('error', '❌ Test 5: Module-Support', `Module-Fehler: ${error.message}`);
+            }
+            
+            // Test 6: Vite-Dev-Server Test
+            fetch('/src/main.tsx')
+                .then(response => {
+                    if (response.ok) {
+                        addTestResult('success', '✅ Test 6: Vite-Server', 'main.tsx ist erreichbar');
+                    } else {
+                        addTestResult('error', '❌ Test 6: Vite-Server', `main.tsx nicht erreichbar (${response.status})`);
+                    }
+                })
+                .catch(error => {
+                    addTestResult('error', '❌ Test 6: Vite-Server', `Vite-Server-Fehler: ${error.message}`);
+                });
+        }
+
+        function createTestRoot() {
+            const testContainer = document.getElementById('test-root');
+            
+            // Erstelle Test-Root
+            const testRoot = document.createElement('div');
+            testRoot.id = 'test-react-root';
+            testRoot.style.cssText = 'background: #e8f5e8; padding: 15px; border: 1px solid #28a745; border-radius: 5px;';
+            testRoot.innerHTML = `
+                <h4>✅ Test-React-Root erstellt!</h4>
+                <p>ID: test-react-root</p>
+                <p>Erstellt um: ${new Date().toLocaleTimeString()}</p>
+                <div style="margin-top: 10px;">
+                    <button onclick="this.parentElement.parentElement.remove()">❌ Entfernen</button>
+                </div>
+            `;
+            
+            testContainer.appendChild(testRoot);
+            
+            addTestResult('success', '✅ Test-Root erstellt', 'Test-React-Root erfolgreich erstellt und eingefügt');
+        }
+
+        // Automatische Tests beim Laden
+        document.addEventListener('DOMContentLoaded', runTests);
+        
+        // Backup falls DOMContentLoaded bereits gefeuert wurde
+        if (document.readyState !== 'loading') {
+            runTests();
+        }
+    </script>
+</body>
+</html>
