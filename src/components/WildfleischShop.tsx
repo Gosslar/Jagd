@@ -154,70 +154,103 @@ export const WildfleischShop = () => {
 
   // Warenkorb-Funktionen
   const addToWarenkorb = (produkt: ShopProdukt, menge: number = 1) => {
-    if (menge > produkt.lagerbestand) {
-      toast({
-        title: "Nicht genügend Lagerbestand",
-        description: `Nur noch ${produkt.lagerbestand} Stück verfügbar.`,
-        variant: "destructive",
-      });
-      return;
-    }
+    try {
+      // Sicherheitsprüfungen
+      if (!produkt || !produkt.id) {
+        console.error('Ungültiges Produkt:', produkt);
+        return;
+      }
+      
+      if (menge <= 0) {
+        console.error('Ungültige Menge:', menge);
+        return;
+      }
+      
+      if (menge > produkt.lagerbestand) {
+        toast({
+          title: "Nicht genügend Lagerbestand",
+          description: `Nur noch ${produkt.lagerbestand} Stück verfügbar.`,
+          variant: "destructive",
+        });
+        return;
+      }
 
-    setWarenkorb(prev => {
-      const existingItem = prev.find(item => item.produkt.id === produkt.id);
-      if (existingItem) {
-        const newMenge = existingItem.menge + menge;
-        if (newMenge > produkt.lagerbestand) {
-          toast({
-            title: "Nicht genügend Lagerbestand",
-            description: `Nur noch ${produkt.lagerbestand} Stück verfügbar.`,
-            variant: "destructive",
-          });
+      setWarenkorb(prev => {
+        try {
+          const existingItem = prev.find(item => item.produkt.id === produkt.id);
+          if (existingItem) {
+            const newMenge = existingItem.menge + menge;
+            if (newMenge > produkt.lagerbestand) {
+              toast({
+                title: "Nicht genügend Lagerbestand",
+                description: `Nur noch ${produkt.lagerbestand} Stück verfügbar.`,
+                variant: "destructive",
+              });
+              return prev;
+            }
+            return prev.map(item =>
+              item.produkt.id === produkt.id
+                ? { ...item, menge: newMenge }
+                : item
+            );
+          } else {
+            return [...prev, { produkt, menge }];
+          }
+        } catch (error) {
+          console.error('Fehler beim Aktualisieren des Warenkorbs:', error);
           return prev;
         }
-        return prev.map(item =>
-          item.produkt.id === produkt.id
-            ? { ...item, menge: newMenge }
-            : item
-        );
-      } else {
-        return [...prev, { produkt, menge }];
-      }
-    });
+      });
 
-    toast({
-      title: "Zum Warenkorb hinzugefügt",
-      description: `${menge}x ${produkt.name}`,
-    });
+      toast({
+        title: "Zum Warenkorb hinzugefügt",
+        description: `${menge}x ${produkt.name}`,
+      });
+    } catch (error) {
+      console.error('Fehler in addToWarenkorb:', error);
+      toast({
+        title: "Fehler",
+        description: "Artikel konnte nicht hinzugefügt werden.",
+        variant: "destructive",
+      });
+    }
   };
 
   const updateWarenkorbMenge = (produktId: string, newMenge: number) => {
-    if (newMenge <= 0) {
-      removeFromWarenkorb(produktId);
-      return;
-    }
+    try {
+      if (newMenge <= 0) {
+        removeFromWarenkorb(produktId);
+        return;
+      }
 
-    const produkt = produkte.find(p => p.id === produktId);
-    if (produkt && newMenge > produkt.lagerbestand) {
-      toast({
-        title: "Nicht genügend Lagerbestand",
-        description: `Nur noch ${produkt.lagerbestand} Stück verfügbar.`,
-        variant: "destructive",
-      });
-      return;
-    }
+      const produkt = produkte.find(p => p.id === produktId);
+      if (produkt && newMenge > produkt.lagerbestand) {
+        toast({
+          title: "Nicht genügend Lagerbestand",
+          description: `Nur noch ${produkt.lagerbestand} Stück verfügbar.`,
+          variant: "destructive",
+        });
+        return;
+      }
 
-    setWarenkorb(prev =>
-      prev.map(item =>
-        item.produkt.id === produktId
-          ? { ...item, menge: newMenge }
-          : item
-      )
-    );
+      setWarenkorb(prev =>
+        prev.map(item =>
+          item.produkt.id === produktId
+            ? { ...item, menge: newMenge }
+            : item
+        )
+      );
+    } catch (error) {
+      console.error('Fehler beim Aktualisieren der Menge:', error);
+    }
   };
 
   const removeFromWarenkorb = (produktId: string) => {
-    setWarenkorb(prev => prev.filter(item => item.produkt.id !== produktId));
+    try {
+      setWarenkorb(prev => prev.filter(item => item.produkt.id !== produktId));
+    } catch (error) {
+      console.error('Fehler beim Entfernen aus Warenkorb:', error);
+    }
   };
 
   const getWarenkorbTotal = () => {
