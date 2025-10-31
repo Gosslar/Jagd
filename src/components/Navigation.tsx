@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthProvider';
 import { AuthDialog } from './AuthDialog';
-import { LogOut, User, Menu, X } from 'lucide-react';
+import { LogOut, User, Menu, X, TestTube } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const scrollToSection = (sectionId: string) => {
   const element = document.getElementById(sectionId);
@@ -82,6 +83,15 @@ export const Navigation: React.FC = () => {
             ) : (
               <AuthDialog />
             )}
+            
+            {/* Test Link */}
+            <Link 
+              to="/test" 
+              className="flex items-center gap-1 text-white hover:text-green-200 transition-colors duration-200 ml-4"
+            >
+              <TestTube className="h-4 w-4" />
+              <span className="text-sm">Test</span>
+            </Link>
           </div>
 
           {/* Mobile menu button */}
