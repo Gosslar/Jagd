@@ -15,12 +15,13 @@ import { ShoppingCart, Plus, Minus, Trash2, Mail, Phone, MapPin, RefreshCw, Lock
 
 interface WildfleischItem {
   id: string;
-  produkt_name: string;
+  name: string;
+  produkt_name?: string;
   kategorie: string;
   preis: number;
   einheit: string;
   lagerbestand: number;
-  verfügbar: boolean;
+  verfuegbar: boolean;
 }
 
 interface BestellItem {
@@ -46,10 +47,15 @@ export const WildfleischShop: React.FC = () => {
   // Lade Sortiment aus Datenbank
   const fetchSortiment = async () => {
     try {
+      console.log('Loading products from shop_produkte_2025_10_27_14_00...');
       const { data, error } = await supabase
-        .from('wildfleisch_lager_2025_10_24_14_00')
+        .from('shop_produkte_2025_10_27_14_00')
         .select('*')
-        .order('reihenfolge', { ascending: true });
+        .eq('verfuegbar', true)
+        .gt('lagerbestand', 0)
+        .order('name', { ascending: true });
+      
+      console.log('Products loaded:', data?.length || 0, 'available products');
 
       if (error) {
         console.error('Fehler beim Laden des Sortiments:', error);
@@ -60,8 +66,16 @@ export const WildfleischShop: React.FC = () => {
         });
         return;
       }
+      
+      // Konvertiere zu WildfleischItem Format
+      const convertedProducts: WildfleischItem[] = (data || []).map(product => ({
+        ...product,
+        produkt_name: product.name // Für Kompatibilität
+      }));
+      
+      console.log('Products converted:', convertedProducts.length, 'products');
 
-      setWildfleischSortiment(data || []);
+      setWildfleischSortiment(convertedProducts);
     } catch (error) {
       console.error('Unerwarteter Fehler:', error);
     } finally {
@@ -85,7 +99,8 @@ export const WildfleischShop: React.FC = () => {
   }, [user]);
 
   const addToWarenkorb = (item: WildfleischItem) => {
-    const existingItem = warenkorb.find(w => w.produkt === item.produkt_name);
+    const productName = item.name || item.produkt_name;
+    const existingItem = warenkorb.find(w => w.produkt === productName);
     
     if (existingItem) {
       if (existingItem.menge >= item.lagerbestand) {
@@ -97,13 +112,13 @@ export const WildfleischShop: React.FC = () => {
         return;
       }
       setWarenkorb(warenkorb.map(w => 
-        w.produkt === item.produkt_name 
+        w.produkt === productName 
           ? { ...w, menge: w.menge + 1 }
           : w
       ));
     } else {
       setWarenkorb([...warenkorb, {
-        produkt: item.produkt_name,
+        produkt: productName,
         preis: item.preis,
         menge: 1
       }]);
@@ -121,7 +136,7 @@ export const WildfleischShop: React.FC = () => {
       return;
     }
 
-    const item = wildfleischSortiment.find(w => w.produkt_name === produktName);
+    const item = wildfleischSortiment.find(w => (w.name || w.produkt_name) === produktName);
     if (item && newMenge > item.lagerbestand) {
       toast({
         title: "Nicht genügend Lagerbestand",
@@ -324,7 +339,7 @@ export const WildfleischShop: React.FC = () => {
                       <TableRow key={item.id}>
                         <TableCell className="font-medium">
                           <div>
-                            {item.produkt_name}
+                            {item.name || item.produkt_name}
                             <div className="text-sm text-gray-500">
                               Lagerbestand: {item.lagerbestand}
                             </div>
