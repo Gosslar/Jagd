@@ -30,6 +30,15 @@ interface WildfleischItem {
   verfuegbar: boolean;
 }
 
+interface ShopKategorie {
+  id: string;
+  name: string;
+  beschreibung?: string;
+  icon?: string;
+  farbe?: string;
+  reihenfolge?: number;
+}
+
 interface WarenkorbItem {
   produkt: string;
   menge: number;
@@ -58,6 +67,7 @@ const DEFAULT_CATEGORIES = {
 export const ProfessionalWildfleischShop: React.FC = () => {
   const { user } = useAuth();
   const [wildfleischSortiment, setWildfleischSortiment] = useState<WildfleischItem[]>([]);
+  const [kategorien, setKategorien] = useState<ShopKategorie[]>([]);
   const [warenkorb, setWarenkorb] = useState<WarenkorbItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -82,10 +92,38 @@ export const ProfessionalWildfleischShop: React.FC = () => {
     return 'Spezialitäten';
   };
 
+  // Lade Kategorien aus der Datenbank
+  const fetchKategorien = async () => {
+    try {
+      console.log('Loading categories from shop_kategorien_2025_10_27_14_00...');
+      const { data: kategorienData, error } = await supabase
+        .from('shop_kategorien_2025_10_27_14_00')
+        .select('*')
+        .order('reihenfolge', { ascending: true });
+
+      if (error) {
+        console.error('Error loading categories:', error);
+        return [];
+      }
+
+      console.log('Categories loaded:', kategorienData);
+      return kategorienData || [];
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      return [];
+    }
+  };
+
   // Lade Sortiment
   const fetchSortiment = async () => {
     try {
       setLoading(true);
+      console.log('Loading products and categories...');
+      
+      // Lade Kategorien
+      const kategorienData = await fetchKategorien();
+      setKategorien(kategorienData);
+      
       console.log('Loading products from shop_produkte_2025_10_27_14_00...');
       
       const { data, error } = await supabase
@@ -136,16 +174,34 @@ export const ProfessionalWildfleischShop: React.FC = () => {
     }
   }, [user]);
 
-  // Gruppiere Produkte nach Kategorien
+  // Finde Kategorie für Produkt
+  const findeKategorieForProdukt = (produkt: WildfleischItem): ShopKategorie | null => {
+    if (produkt.kategorie_id) {
+      return kategorien.find(k => k.id === produkt.kategorie_id) || null;
+    }
+    // Fallback: Kategorisierung basierend auf Namen
+    const kategorieName = kategorisiereProdukt(produkt.name);
+    return kategorien.find(k => k.name === kategorieName) || null;
+  };
+
+  // Gruppiere Produkte nach echten Kategorien
   const produkteByKategorie = wildfleischSortiment.reduce((acc, produkt) => {
-    const kategorie = kategorisiereProdukt(produkt.name);
-    if (!acc[kategorie]) acc[kategorie] = [];
-    acc[kategorie].push(produkt);
+    const kategorie = findeKategorieForProdukt(produkt);
+    const kategorieName = kategorie?.name || 'Sonstige';
+    
+    if (!acc[kategorieName]) acc[kategorieName] = [];
+    acc[kategorieName].push(produkt);
     return acc;
   }, {} as {[key: string]: WildfleischItem[]});
 
-  // Verfügbare Kategorien
-  const verfuegbareKategorien = ['Alle', ...Object.keys(produkteByKategorie).sort()];
+  // Verfügbare Kategorien - verwende echte Kategorien aus der Datenbank
+  const verfuegbareKategorien = [
+    'Alle', 
+    ...kategorien
+      .filter(k => produkteByKategorie[k.name] && produkteByKategorie[k.name].length > 0)
+      .sort((a, b) => (a.reihenfolge || 999) - (b.reihenfolge || 999))
+      .map(k => k.name)
+  ];
 
   // Gefilterte Produkte
   const gefilterteProdukte = activeKategorie === 'Alle' 
@@ -331,7 +387,13 @@ export const ProfessionalWildfleischShop: React.FC = () => {
                 const produktCount = kategorie === 'Alle' 
                   ? wildfleischSortiment.length 
                   : produkteByKategorie[kategorie]?.length || 0;
-                const categoryInfo = DEFAULT_CATEGORIES[kategorie as keyof typeof DEFAULT_CATEGORIES];
+                // Finde echte Kategorie-Info oder verwende Fallback
+                const echteKategorie = kategorien.find(k => k.name === kategorie);
+                const categoryInfo = echteKategorie ? {
+                  icon: echteKategorie.icon || '📦',
+                  farbe: echteKategorie.farbe || '#666666',
+                  beschreibung: echteKategorie.beschreibung || ''
+                } : (kategorie === 'Alle' ? { icon: '📦', farbe: '#666666', beschreibung: 'Alle Produkte' } : DEFAULT_CATEGORIES[kategorie as keyof typeof DEFAULT_CATEGORIES] || { icon: '📦', farbe: '#666666', beschreibung: '' });
                 
                 return (
                   <Button
@@ -429,21 +491,32 @@ export const ProfessionalWildfleischShop: React.FC = () => {
           <div className="space-y-6">
             {/* Kategorie-Header */}
             {activeKategorie !== 'Alle' && (
-              <Card style={{ borderColor: DEFAULT_CATEGORIES[activeKategorie as keyof typeof DEFAULT_CATEGORIES]?.farbe }}>
-                <CardHeader style={{ backgroundColor: `${DEFAULT_CATEGORIES[activeKategorie as keyof typeof DEFAULT_CATEGORIES]?.farbe}15` }}>
-                  <CardTitle className="flex items-center gap-3">
-                    <span className="text-3xl">
-                      {DEFAULT_CATEGORIES[activeKategorie as keyof typeof DEFAULT_CATEGORIES]?.icon}
-                    </span>
+              (() => {
+                const echteKategorie = kategorien.find(k => k.name === activeKategorie);
+                const categoryInfo = echteKategorie ? {
+                  icon: echteKategorie.icon || '📦',
+                  farbe: echteKategorie.farbe || '#666666',
+                  beschreibung: echteKategorie.beschreibung || ''
+                } : DEFAULT_CATEGORIES[activeKategorie as keyof typeof DEFAULT_CATEGORIES] || { icon: '📦', farbe: '#666666', beschreibung: '' };
+                
+                return (
+                  <Card style={{ borderColor: categoryInfo?.farbe }}>
+                    <CardHeader style={{ backgroundColor: `${categoryInfo?.farbe}15` }}>
+                      <CardTitle className="flex items-center gap-3">
+                        <span className="text-3xl">
+                          {categoryInfo?.icon}
+                        </span>
                     <div>
                       <h2 className="text-2xl">{activeKategorie}</h2>
                       <p className="text-muted-foreground font-normal">
-                        {DEFAULT_CATEGORIES[activeKategorie as keyof typeof DEFAULT_CATEGORIES]?.beschreibung}
+                        {categoryInfo?.beschreibung}
                       </p>
                     </div>
                   </CardTitle>
                 </CardHeader>
               </Card>
+                );
+              })()
             )}
 
             {/* Produkte Grid */}
