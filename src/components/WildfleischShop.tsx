@@ -181,27 +181,57 @@ export const WildfleischShop: React.FC = () => {
     setSubmitting(true);
 
     try {
-      const bestellDetails = warenkorb.map(item => 
-        `${item.menge}x ${item.produkt} (${item.preis.toFixed(2)}€/Stück)`
-      ).join('\n');
-
+      console.log('Submitting order:', { formData, warenkorb });
+      
       const gesamtpreis = getTotal();
-
-      const { error } = await supabase.functions.invoke('wildfleisch_bestellung_resend_2025_10_25_19_00', {
-        body: {
+      
+      // Direkte Datenbank-Speicherung statt Edge Function
+      const { data: bestellungData, error: bestellungError } = await supabase
+        .from('shop_bestellungen_2025_10_27_14_00')
+        .insert({
           name: formData.name,
           email: formData.email,
-          phone: formData.phone,
-          address: formData.address,
+          telefon: formData.phone,
+          adresse: formData.address,
           nachricht: formData.nachricht,
-          bestellung: bestellDetails,
-          gesamtpreis: gesamtpreis.toFixed(2)
-        }
-      });
-
-      if (error) {
-        throw error;
+          gesamtpreis: gesamtpreis,
+          status: 'neu',
+          erstellt_am: new Date().toISOString()
+        })
+        .select()
+        .single();
+      
+      if (bestellungError) {
+        console.error('Fehler beim Erstellen der Bestellung:', bestellungError);
+        throw new Error(`Bestellung konnte nicht erstellt werden: ${bestellungError.message}`);
       }
+      
+      console.log('Bestellung erstellt:', bestellungData);
+      
+      // Bestellpositionen hinzufügen
+      const bestellpositionen = warenkorb.map(item => ({
+        bestellung_id: bestellungData.id,
+        produkt_name: item.produkt,
+        menge: item.menge,
+        einzelpreis: item.preis,
+        gesamtpreis: item.menge * item.preis
+      }));
+      
+      const { error: positionenError } = await supabase
+        .from('shop_bestellpositionen_2025_10_27_14_00')
+        .insert(bestellpositionen);
+      
+      if (positionenError) {
+        console.error('Fehler beim Erstellen der Bestellpositionen:', positionenError);
+        // Bestellung löschen falls Positionen fehlschlagen
+        await supabase
+          .from('shop_bestellungen_2025_10_27_14_00')
+          .delete()
+          .eq('id', bestellungData.id);
+        throw new Error(`Bestellpositionen konnten nicht erstellt werden: ${positionenError.message}`);
+      }
+      
+      console.log('Bestellpositionen erstellt:', bestellpositionen.length);
 
       toast({
         title: "Bestellung gesendet",
