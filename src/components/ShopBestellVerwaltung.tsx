@@ -335,14 +335,34 @@ export const ShopBestellVerwaltung = () => {
       
       // Bei Bestätigung Lagerbestand reduzieren
       if (newStatus === 'bestaetigt') {
-        const { error: stockError } = await supabase.rpc('approve_shop_order', {
-          order_id: bestellungId,
-          admin_user_id: user?.id,
-          admin_note: notiz
-        });
+        console.log('Reduziere Lagerbestand für Bestellung:', bestellungId);
         
-        if (stockError) {
-          console.warn('Lagerbestand-Reduzierung fehlgeschlagen:', stockError);
+        try {
+          const { data: stockResult, error: stockError } = await supabase.rpc('reduce_stock_for_order', {
+            order_id_param: bestellungId
+          });
+          
+          if (stockError) {
+            console.error('Lagerbestand-Reduzierung fehlgeschlagen:', stockError);
+            toast({
+              title: "Warnung",
+              description: `Status geändert, aber Lagerbestand-Reduzierung fehlgeschlagen: ${stockError.message}`,
+              variant: "destructive",
+            });
+          } else {
+            console.log('Lagerbestand-Reduzierung erfolgreich:', stockResult);
+            toast({
+              title: "Lagerbestand reduziert",
+              description: stockResult || 'Lagerbestand wurde entsprechend reduziert',
+            });
+          }
+        } catch (err: any) {
+          console.error('Fehler bei Lagerbestand-Reduzierung:', err);
+          toast({
+            title: "Warnung",
+            description: `Status geändert, aber Lagerbestand-Reduzierung fehlgeschlagen: ${err.message}`,
+            variant: "destructive",
+          });
         }
       }
       
