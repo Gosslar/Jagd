@@ -8,7 +8,7 @@ import { Wildarten } from '@/components/Wildarten';
 import { Praedatorenmanagement } from '@/components/Praedatorenmanagement';
 import { Jagdhunde } from '@/components/Jagdhunde';
 import { Rehkitzrettung } from '@/components/Rehkitzrettung';
-import { WildfleischShop } from '@/components/WildfleischShop';
+import { ProfessionalWildfleischShop } from '@/components/ProfessionalWildfleischShop';
 import { Contact } from '@/components/Contact';
 import { Footer } from '@/components/Footer';
 import { News } from '@/components/News';
@@ -41,7 +41,7 @@ const IndexContent = () => {
       <Praedatorenmanagement />
       <Jagdhunde />
       <Rehkitzrettung />
-      <WildfleischShop />
+      <ProfessionalWildfleischShop />
       <Contact />
       
 
