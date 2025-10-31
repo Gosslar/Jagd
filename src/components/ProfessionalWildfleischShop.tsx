@@ -20,24 +20,14 @@ import {
   CheckCircle
 } from 'lucide-react';
 
-interface Kategorie {
-  id: string;
-  name: string;
-  beschreibung?: string;
-  reihenfolge?: number;
-  icon?: string;
-  farbe?: string;
-}
-
 interface WildfleischItem {
   id: string;
   name: string;
-  kategorie_id: string;
+  kategorie_id?: string;
   preis: number;
   einheit: string;
   lagerbestand: number;
   verfuegbar: boolean;
-  kategorie?: Kategorie;
 }
 
 interface WarenkorbItem {
@@ -55,14 +45,23 @@ interface FormData {
   nachricht: string;
 }
 
+// Standard-Kategorien als Fallback
+const DEFAULT_CATEGORIES = {
+  'Rehwild': { icon: '🦌', farbe: '#8B4513', beschreibung: 'Zartes Rehfleisch aus heimischen Wäldern' },
+  'Rotwild': { icon: '🦌', farbe: '#A0522D', beschreibung: 'Kräftiges Hirschfleisch von höchster Qualität' },
+  'Schwarzwild': { icon: '🐗', farbe: '#654321', beschreibung: 'Würziges Wildschweinefleisch' },
+  'Federwild': { icon: '🦆', farbe: '#228B22', beschreibung: 'Delikates Geflügel aus freier Wildbahn' },
+  'Wurstspezialitäten': { icon: '🌭', farbe: '#B22222', beschreibung: 'Hausgemachte Wildwurst nach traditionellen Rezepten' },
+  'Spezialitäten': { icon: '⭐', farbe: '#DAA520', beschreibung: 'Besondere Wildspezialitäten und Delikatessen' }
+};
+
 export const ProfessionalWildfleischShop: React.FC = () => {
   const { user } = useAuth();
-  const [kategorien, setKategorien] = useState<Kategorie[]>([]);
-  const [produkteByKategorie, setProdukteByKategorie] = useState<{[key: string]: WildfleischItem[]}>({});
+  const [wildfleischSortiment, setWildfleischSortiment] = useState<WildfleischItem[]>([]);
   const [warenkorb, setWarenkorb] = useState<WarenkorbItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [activeKategorie, setActiveKategorie] = useState<string | null>(null);
+  const [activeKategorie, setActiveKategorie] = useState<string>('Alle');
   
   const [formData, setFormData] = useState<FormData>({
     name: '',
@@ -72,94 +71,49 @@ export const ProfessionalWildfleischShop: React.FC = () => {
     nachricht: ''
   });
 
-  // Lade Kategorien und Produkte
-  const fetchData = async () => {
+  // Kategorisiere Produkte basierend auf Namen
+  const kategorisiereProdukt = (produktName: string): string => {
+    const name = produktName.toLowerCase();
+    if (name.includes('reh')) return 'Rehwild';
+    if (name.includes('hirsch') || name.includes('rot')) return 'Rotwild';
+    if (name.includes('schwein') || name.includes('sau')) return 'Schwarzwild';
+    if (name.includes('ente') || name.includes('fasan') || name.includes('gans')) return 'Federwild';
+    if (name.includes('wurst') || name.includes('bratwurst')) return 'Wurstspezialitäten';
+    return 'Spezialitäten';
+  };
+
+  // Lade Sortiment
+  const fetchSortiment = async () => {
     try {
       setLoading(true);
+      console.log('Loading products from shop_produkte_2025_10_27_14_00...');
       
-      // Lade Kategorien
-      const { data: kategorienData, error: kategorienError } = await supabase
-        .from('shop_kategorien_2025_10_27_14_00')
-        .select('*')
-        .order('name');
-      
-      if (kategorienError) throw kategorienError;
-      
-      // Lade Produkte mit Kategorien
-      const { data: produkteData, error: produkteError } = await supabase
+      const { data, error } = await supabase
         .from('shop_produkte_2025_10_27_14_00')
-        .select(`
-          *,
-          shop_kategorien_2025_10_27_14_00 (
-            id,
-            name,
-            beschreibung,
-            reihenfolge,
-            icon,
-            farbe
-          )
-        `)
+        .select('*')
         .eq('verfuegbar', true)
         .gt('lagerbestand', 0)
-        .order('name');
+        .order('name', { ascending: true });
       
-      if (produkteError) throw produkteError;
-      
-      // Gruppiere Produkte nach Kategorien
-      const grouped: {[key: string]: WildfleischItem[]} = {};
-      const kategorienMap: {[key: string]: Kategorie} = {};
-      
-      // Erstelle Kategorien-Map
-      (kategorienData || []).forEach(kat => {
-        kategorienMap[kat.id] = {
-          ...kat,
-          reihenfolge: kat.reihenfolge || 999,
-          icon: kat.icon || '📦',
-          farbe: kat.farbe || '#8B4513',
-          beschreibung: kat.beschreibung || 'Hochwertige Wildspezialitäten'
-        };
-      });
-      
-      // Gruppiere Produkte
-      (produkteData || []).forEach(produkt => {
-        const kategorie = produkt.shop_kategorien_2025_10_27_14_00;
-        const kategorieId = kategorie?.id || 'andere';
-        
-        if (!grouped[kategorieId]) {
-          grouped[kategorieId] = [];
-        }
-        
-        grouped[kategorieId].push({
-          ...produkt,
-          kategorie: kategorienMap[kategorieId] || {
-            id: 'andere',
-            name: 'Andere',
-            beschreibung: 'Weitere Produkte',
-            reihenfolge: 999,
-            icon: '📦',
-            farbe: '#8B4513'
-          }
+      console.log('Products loaded:', data?.length || 0, 'available products');
+
+      if (error) {
+        console.error('Fehler beim Laden des Sortiments:', error);
+        toast({
+          title: "Fehler",
+          description: "Sortiment konnte nicht geladen werden.",
+          variant: "destructive",
         });
-      });
-      
-      // Sortiere Kategorien
-      const sortierteKategorien = Object.values(kategorienMap)
-        .filter(kat => grouped[kat.id] && grouped[kat.id].length > 0)
-        .sort((a, b) => (a.reihenfolge || 999) - (b.reihenfolge || 999));
-      
-      setKategorien(sortierteKategorien);
-      setProdukteByKategorie(grouped);
-      
-      // Setze erste Kategorie als aktiv
-      if (sortierteKategorien.length > 0 && !activeKategorie) {
-        setActiveKategorie(sortierteKategorien[0].id);
+        return;
       }
+
+      setWildfleischSortiment(data || []);
       
     } catch (error: any) {
-      console.error('Fehler beim Laden:', error);
+      console.error('Unerwarteter Fehler:', error);
       toast({
         title: "Fehler",
-        description: "Sortiment konnte nicht geladen werden.",
+        description: "Ein unerwarteter Fehler ist aufgetreten.",
         variant: "destructive",
       });
     } finally {
@@ -168,7 +122,7 @@ export const ProfessionalWildfleischShop: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchData();
+    fetchSortiment();
   }, []);
 
   // Fülle Formular mit Benutzerdaten
@@ -181,6 +135,22 @@ export const ProfessionalWildfleischShop: React.FC = () => {
       }));
     }
   }, [user]);
+
+  // Gruppiere Produkte nach Kategorien
+  const produkteByKategorie = wildfleischSortiment.reduce((acc, produkt) => {
+    const kategorie = kategorisiereProdukt(produkt.name);
+    if (!acc[kategorie]) acc[kategorie] = [];
+    acc[kategorie].push(produkt);
+    return acc;
+  }, {} as {[key: string]: WildfleischItem[]});
+
+  // Verfügbare Kategorien
+  const verfuegbareKategorien = ['Alle', ...Object.keys(produkteByKategorie).sort()];
+
+  // Gefilterte Produkte
+  const gefilterteProdukte = activeKategorie === 'Alle' 
+    ? wildfleischSortiment 
+    : produkteByKategorie[activeKategorie] || [];
 
   const addToWarenkorb = (item: WildfleischItem) => {
     const existingItem = warenkorb.find(w => w.produkt === item.name);
@@ -220,8 +190,7 @@ export const ProfessionalWildfleischShop: React.FC = () => {
       return;
     }
 
-    const allProdukte = Object.values(produkteByKategorie).flat();
-    const item = allProdukte.find(p => p.name === produktName);
+    const item = wildfleischSortiment.find(p => p.name === produktName);
     if (item && newMenge > item.lagerbestand) {
       toast({
         title: "Nicht genügend Lagerbestand",
@@ -358,19 +327,25 @@ export const ProfessionalWildfleischShop: React.FC = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
-              {kategorien.map((kategorie) => {
-                const produktCount = produkteByKategorie[kategorie.id]?.length || 0;
+              {verfuegbareKategorien.map((kategorie) => {
+                const produktCount = kategorie === 'Alle' 
+                  ? wildfleischSortiment.length 
+                  : produkteByKategorie[kategorie]?.length || 0;
+                const categoryInfo = DEFAULT_CATEGORIES[kategorie as keyof typeof DEFAULT_CATEGORIES];
+                
                 return (
                   <Button
-                    key={kategorie.id}
-                    variant={activeKategorie === kategorie.id ? "default" : "outline"}
+                    key={kategorie}
+                    variant={activeKategorie === kategorie ? "default" : "outline"}
                     className="w-full justify-start h-auto p-4"
-                    onClick={() => setActiveKategorie(kategorie.id)}
+                    onClick={() => setActiveKategorie(kategorie)}
                   >
                     <div className="flex items-center gap-3 w-full">
-                      <span className="text-2xl">{kategorie.icon}</span>
+                      <span className="text-2xl">
+                        {kategorie === 'Alle' ? '📦' : categoryInfo?.icon || '📦'}
+                      </span>
                       <div className="flex-1 text-left">
-                        <div className="font-medium">{kategorie.name}</div>
+                        <div className="font-medium">{kategorie}</div>
                         <div className="text-xs text-muted-foreground">
                           {produktCount} Produkte
                         </div>
@@ -451,65 +426,74 @@ export const ProfessionalWildfleischShop: React.FC = () => {
 
         {/* Produkte */}
         <div className="lg:col-span-2">
-          {activeKategorie && produkteByKategorie[activeKategorie] && (
-            <div className="space-y-6">
-              {/* Kategorie-Header */}
-              {(() => {
-                const kategorie = kategorien.find(k => k.id === activeKategorie);
-                return kategorie ? (
-                  <Card style={{ borderColor: kategorie.farbe }}>
-                    <CardHeader style={{ backgroundColor: `${kategorie.farbe}15` }}>
-                      <CardTitle className="flex items-center gap-3">
-                        <span className="text-3xl">{kategorie.icon}</span>
-                        <div>
-                          <h2 className="text-2xl">{kategorie.name}</h2>
-                          <p className="text-muted-foreground font-normal">
-                            {kategorie.beschreibung}
-                          </p>
-                        </div>
-                      </CardTitle>
-                    </CardHeader>
-                  </Card>
-                ) : null;
-              })()}
+          <div className="space-y-6">
+            {/* Kategorie-Header */}
+            {activeKategorie !== 'Alle' && (
+              <Card style={{ borderColor: DEFAULT_CATEGORIES[activeKategorie as keyof typeof DEFAULT_CATEGORIES]?.farbe }}>
+                <CardHeader style={{ backgroundColor: `${DEFAULT_CATEGORIES[activeKategorie as keyof typeof DEFAULT_CATEGORIES]?.farbe}15` }}>
+                  <CardTitle className="flex items-center gap-3">
+                    <span className="text-3xl">
+                      {DEFAULT_CATEGORIES[activeKategorie as keyof typeof DEFAULT_CATEGORIES]?.icon}
+                    </span>
+                    <div>
+                      <h2 className="text-2xl">{activeKategorie}</h2>
+                      <p className="text-muted-foreground font-normal">
+                        {DEFAULT_CATEGORIES[activeKategorie as keyof typeof DEFAULT_CATEGORIES]?.beschreibung}
+                      </p>
+                    </div>
+                  </CardTitle>
+                </CardHeader>
+              </Card>
+            )}
 
-              {/* Produkte Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {produkteByKategorie[activeKategorie].map((item) => (
-                  <Card key={item.id} className="hover:shadow-lg transition-shadow">
-                    <CardContent className="p-6">
-                      <div className="space-y-4">
-                        <div>
-                          <h3 className="font-bold text-lg">{item.name}</h3>
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <Package className="h-4 w-4" />
-                            <span>Lagerbestand: {item.lagerbestand}</span>
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center justify-between">
-                          <div className="text-2xl font-bold text-primary">
-                            {item.preis.toFixed(2)}€
-                            <span className="text-sm font-normal text-muted-foreground">
-                              /{item.einheit}
-                            </span>
-                          </div>
-                          
-                          <Button
-                            onClick={() => addToWarenkorb(item)}
-                            className="flex items-center gap-2"
-                          >
-                            <Plus className="h-4 w-4" />
-                            Hinzufügen
-                          </Button>
+            {/* Produkte Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {gefilterteProdukte.map((item) => (
+                <Card key={item.id} className="hover:shadow-lg transition-shadow">
+                  <CardContent className="p-6">
+                    <div className="space-y-4">
+                      <div>
+                        <h3 className="font-bold text-lg">{item.name}</h3>
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <Package className="h-4 w-4" />
+                          <span>Lagerbestand: {item.lagerbestand}</span>
                         </div>
                       </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="text-2xl font-bold text-primary">
+                          {item.preis.toFixed(2)}€
+                          <span className="text-sm font-normal text-muted-foreground">
+                            /{item.einheit}
+                          </span>
+                        </div>
+                        
+                        <Button
+                          onClick={() => addToWarenkorb(item)}
+                          className="flex items-center gap-2"
+                        >
+                          <Plus className="h-4 w-4" />
+                          Hinzufügen
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
-          )}
+
+            {gefilterteProdukte.length === 0 && (
+              <Card>
+                <CardContent className="p-8 text-center">
+                  <Package className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-medium mb-2">Keine Produkte verfügbar</h3>
+                  <p className="text-muted-foreground">
+                    In dieser Kategorie sind derzeit keine Produkte verfügbar.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+          </div>
         </div>
 
         {/* Bestellformular */}
