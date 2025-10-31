@@ -9,6 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthProvider';
+import { AuthDialog } from './AuthDialog';
 import { toast } from '@/hooks/use-toast';
 import { ShoppingCart, Plus, Minus, Trash2, Mail, Phone, MapPin, RefreshCw, Lock, LogIn, Info } from 'lucide-react';
 
@@ -263,10 +264,7 @@ export const WildfleischShop: React.FC = () => {
                   <strong>Hinweis:</strong> Um Wildfleisch zu bestellen, müssen Sie sich anmelden. 
                   Sie können das Sortiment gerne durchstöbern, aber für Bestellungen ist eine Registrierung erforderlich.
                 </div>
-                <Button variant="outline" size="sm" className="ml-4 border-blue-300 text-blue-700 hover:bg-blue-100">
-                  <LogIn className="h-4 w-4 mr-2" />
-                  Anmelden
-                </Button>
+                <AuthDialog />
               </div>
             </AlertDescription>
           </Alert>
