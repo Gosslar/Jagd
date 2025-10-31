@@ -92,27 +92,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUp = async (email: string, password: string, userData?: { full_name?: string }) => {
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/`,
-          data: userData
+      // Verwende Edge Function für Registrierung ohne E-Mail-Bestätigung
+      const { data, error } = await supabase.functions.invoke('register_user_without_email_2025_10_28_12_00', {
+        body: {
+          email,
+          password,
+          userData
         }
       });
 
       if (error) throw error;
+      
+      if (data.error) {
+        throw new Error(data.error);
+      }
 
       toast({
         title: "Registrierung erfolgreich",
-        description: "Bitte bestätigen Sie Ihre E-Mail-Adresse. Ihr Konto muss anschließend von einem Administrator freigegeben werden.",
+        description: "Ihr Konto wurde erstellt und muss von einem Administrator freigegeben werden. Sie können sich bereits anmelden.",
       });
 
-      return { data, error: null };
+      return { data: data.user, error: null };
     } catch (error: any) {
+      console.error('Registrierungsfehler:', error);
+      
       toast({
         title: "Registrierung fehlgeschlagen",
-        description: error.message,
+        description: error.message || "Die Registrierung konnte nicht abgeschlossen werden.",
         variant: "destructive",
       });
       return { data: null, error };
