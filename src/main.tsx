@@ -2,18 +2,7 @@ import React from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 
-// Professionelle Jagdrevier Weetzen Website
-const JagdrevierWeetzenApp = () => {
-  const [activeSection, setActiveSection] = React.useState('home')
-
-  const scrollToSection = (sectionId) => {
-    const element = document.getElementById(sectionId)
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' })
-      setActiveSection(sectionId)
-    }
-  }
-
+const JagdrevierWeetzenProfessional = () => {
   return (
     <div style={{ 
       fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
@@ -22,7 +11,7 @@ const JagdrevierWeetzenApp = () => {
       margin: '0',
       padding: '0'
     }}>
-      {/* Navigation */}
+      {/* Fixed Navigation */}
       <nav style={{
         position: 'fixed',
         top: '0',
@@ -48,35 +37,16 @@ const JagdrevierWeetzenApp = () => {
           }}>
             🦌 Jagdrevier Weetzen
           </div>
-          <div style={{ display: 'flex', gap: '2rem' }}>
-            {[
-              { id: 'home', label: 'Home' },
-              { id: 'wildfleisch', label: 'Wildfleisch' },
-              { id: 'jagdhunde', label: 'Jagdhunde' },
-              { id: 'wildarten', label: 'Wildarten' },
-              { id: 'praedatoren', label: 'Prädatoren' },
-              { id: 'kontakt', label: 'Kontakt' }
-            ].map(item => (
-              <button
-                key={item.id}
-                onClick={() => scrollToSection(item.id)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: activeSection === item.id ? '#90EE90' : 'white',
-                  cursor: 'pointer',
-                  fontSize: '1rem',
-                  padding: '0.5rem 1rem',
-                  borderRadius: '4px',
-                  transition: 'all 0.3s ease',
-                  textDecoration: activeSection === item.id ? 'underline' : 'none'
-                }}
-                onMouseOver={(e) => e.target.style.backgroundColor = 'rgba(255,255,255,0.1)'}
-                onMouseOut={(e) => e.target.style.backgroundColor = 'transparent'}
-              >
-                {item.label}
-              </button>
-            ))}
+          <div style={{ 
+            display: 'flex', 
+            gap: '2rem',
+            flexWrap: 'wrap'
+          }}>
+            <a href="#home" style={{ color: 'white', textDecoration: 'none', padding: '0.5rem' }}>Home</a>
+            <a href="#wildfleisch" style={{ color: 'white', textDecoration: 'none', padding: '0.5rem' }}>Wildfleisch</a>
+            <a href="#jagdhunde" style={{ color: 'white', textDecoration: 'none', padding: '0.5rem' }}>Jagdhunde</a>
+            <a href="#wildarten" style={{ color: 'white', textDecoration: 'none', padding: '0.5rem' }}>Wildarten</a>
+            <a href="#kontakt" style={{ color: 'white', textDecoration: 'none', padding: '0.5rem' }}>Kontakt</a>
           </div>
         </div>
       </nav>
@@ -90,7 +60,7 @@ const JagdrevierWeetzenApp = () => {
         justifyContent: 'center',
         textAlign: 'center',
         color: 'white',
-        position: 'relative'
+        paddingTop: '80px'
       }}>
         <div style={{
           maxWidth: '800px',
@@ -118,31 +88,19 @@ const JagdrevierWeetzenApp = () => {
           }}>
             340 Hektar Wald- und Feldlandschaft • Professionelles Wildtiermanagement • Frisches Wildfleisch
           </p>
-          <button
-            onClick={() => scrollToSection('wildfleisch')}
-            style={{
-              backgroundColor: '#90EE90',
-              color: '#2d5a27',
-              border: 'none',
-              padding: '1rem 2rem',
-              fontSize: '1.2rem',
-              borderRadius: '50px',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-              boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
-              transition: 'all 0.3s ease'
-            }}
-            onMouseOver={(e) => {
-              e.target.style.transform = 'translateY(-2px)'
-              e.target.style.boxShadow = '0 6px 20px rgba(0,0,0,0.3)'
-            }}
-            onMouseOut={(e) => {
-              e.target.style.transform = 'translateY(0)'
-              e.target.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)'
-            }}
-          >
-            🥩 Zum Wildfleisch-Shop
-          </button>
+          <div style={{
+            backgroundColor: '#90EE90',
+            color: '#2d5a27',
+            display: 'inline-block',
+            padding: '1rem 2rem',
+            fontSize: '1.2rem',
+            borderRadius: '50px',
+            fontWeight: 'bold',
+            boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
+            cursor: 'pointer'
+          }}>
+            🥩 Wildfleisch aus nachhaltiger Jagd
+          </div>
         </div>
       </section>
 
@@ -160,79 +118,131 @@ const JagdrevierWeetzenApp = () => {
           }}>
             🥩 Wildfleisch-Shop
           </h2>
+          
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
             gap: '2rem',
             marginBottom: '3rem'
           }}>
-            {[
-              {
-                title: 'Rehfleisch',
-                description: 'Zartes, mageres Fleisch aus nachhaltiger Jagd',
-                products: ['Rehkeule (2-3 kg)', 'Rehrücken (1-2 kg)', 'Rehgulasch (1 kg)', 'Rehschnitzel (500g)'],
-                price: 'ab 18€/kg'
-              },
-              {
-                title: 'Wildschwein',
-                description: 'Kräftiges, aromatisches Fleisch vom Schwarzwild',
-                products: ['Wildschweingulasch (1 kg)', 'Wildschweinschnitzel (500g)', 'Wildschweinhackfleisch (500g)', 'Wildschweinbraten (2-4 kg)'],
-                price: 'ab 15€/kg'
-              },
-              {
-                title: 'Federwild',
-                description: 'Delikates Geflügel aus freier Wildbahn',
-                products: ['Wildente (ganz)', 'Wildgans (ganz)', 'Fasan (ganz)', 'Wildentenbrust (300g)'],
-                price: 'ab 25€/kg'
-              }
-            ].map((product, index) => (
-              <div key={index} style={{
-                backgroundColor: 'white',
-                padding: '2rem',
-                borderRadius: '12px',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-                transition: 'transform 0.3s ease'
-              }}
-              onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
-              onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-              >
-                <h3 style={{
-                  fontSize: '1.8rem',
-                  marginBottom: '1rem',
-                  color: '#2d5a27'
-                }}>
-                  {product.title}
-                </h3>
-                <p style={{
-                  marginBottom: '1.5rem',
-                  color: '#666'
-                }}>
-                  {product.description}
-                </p>
-                <ul style={{
-                  listStyle: 'none',
-                  padding: '0',
-                  marginBottom: '1.5rem'
-                }}>
-                  {product.products.map((item, i) => (
-                    <li key={i} style={{
-                      padding: '0.5rem 0',
-                      borderBottom: '1px solid #eee'
-                    }}>
-                      • {item}
-                    </li>
-                  ))}
-                </ul>
-                <div style={{
-                  fontSize: '1.3rem',
-                  fontWeight: 'bold',
-                  color: '#2d5a27'
-                }}>
-                  {product.price}
-                </div>
+            {/* Rehfleisch */}
+            <div style={{
+              backgroundColor: 'white',
+              padding: '2rem',
+              borderRadius: '12px',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+            }}>
+              <h3 style={{
+                fontSize: '1.8rem',
+                marginBottom: '1rem',
+                color: '#2d5a27'
+              }}>
+                🦌 Rehfleisch
+              </h3>
+              <p style={{
+                marginBottom: '1.5rem',
+                color: '#666'
+              }}>
+                Zartes, mageres Fleisch aus nachhaltiger Jagd
+              </p>
+              <ul style={{
+                listStyle: 'none',
+                padding: '0',
+                marginBottom: '1.5rem'
+              }}>
+                <li style={{ padding: '0.5rem 0', borderBottom: '1px solid #eee' }}>• Rehkeule (2-3 kg)</li>
+                <li style={{ padding: '0.5rem 0', borderBottom: '1px solid #eee' }}>• Rehrücken (1-2 kg)</li>
+                <li style={{ padding: '0.5rem 0', borderBottom: '1px solid #eee' }}>• Rehgulasch (1 kg)</li>
+                <li style={{ padding: '0.5rem 0', borderBottom: '1px solid #eee' }}>• Rehschnitzel (500g)</li>
+              </ul>
+              <div style={{
+                fontSize: '1.3rem',
+                fontWeight: 'bold',
+                color: '#2d5a27'
+              }}>
+                ab 18€/kg
               </div>
-            ))}
+            </div>
+
+            {/* Wildschwein */}
+            <div style={{
+              backgroundColor: 'white',
+              padding: '2rem',
+              borderRadius: '12px',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+            }}>
+              <h3 style={{
+                fontSize: '1.8rem',
+                marginBottom: '1rem',
+                color: '#2d5a27'
+              }}>
+                🐗 Wildschwein
+              </h3>
+              <p style={{
+                marginBottom: '1.5rem',
+                color: '#666'
+              }}>
+                Kräftiges, aromatisches Fleisch vom Schwarzwild
+              </p>
+              <ul style={{
+                listStyle: 'none',
+                padding: '0',
+                marginBottom: '1.5rem'
+              }}>
+                <li style={{ padding: '0.5rem 0', borderBottom: '1px solid #eee' }}>• Wildschweingulasch (1 kg)</li>
+                <li style={{ padding: '0.5rem 0', borderBottom: '1px solid #eee' }}>• Wildschweinschnitzel (500g)</li>
+                <li style={{ padding: '0.5rem 0', borderBottom: '1px solid #eee' }}>• Wildschweinhackfleisch (500g)</li>
+                <li style={{ padding: '0.5rem 0', borderBottom: '1px solid #eee' }}>• Wildschweinbraten (2-4 kg)</li>
+              </ul>
+              <div style={{
+                fontSize: '1.3rem',
+                fontWeight: 'bold',
+                color: '#2d5a27'
+              }}>
+                ab 15€/kg
+              </div>
+            </div>
+
+            {/* Federwild */}
+            <div style={{
+              backgroundColor: 'white',
+              padding: '2rem',
+              borderRadius: '12px',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+            }}>
+              <h3 style={{
+                fontSize: '1.8rem',
+                marginBottom: '1rem',
+                color: '#2d5a27'
+              }}>
+                🦆 Federwild
+              </h3>
+              <p style={{
+                marginBottom: '1.5rem',
+                color: '#666'
+              }}>
+                Delikates Geflügel aus freier Wildbahn
+              </p>
+              <ul style={{
+                listStyle: 'none',
+                padding: '0',
+                marginBottom: '1.5rem'
+              }}>
+                <li style={{ padding: '0.5rem 0', borderBottom: '1px solid #eee' }}>• Wildente (ganz)</li>
+                <li style={{ padding: '0.5rem 0', borderBottom: '1px solid #eee' }}>• Wildgans (ganz)</li>
+                <li style={{ padding: '0.5rem 0', borderBottom: '1px solid #eee' }}>• Fasan (ganz)</li>
+                <li style={{ padding: '0.5rem 0', borderBottom: '1px solid #eee' }}>• Wildentenbrust (300g)</li>
+              </ul>
+              <div style={{
+                fontSize: '1.3rem',
+                fontWeight: 'bold',
+                color: '#2d5a27'
+              }}>
+                ab 25€/kg
+              </div>
+            </div>
           </div>
+
           <div style={{
             textAlign: 'center',
             backgroundColor: '#e8f5e8',
@@ -271,73 +281,116 @@ const JagdrevierWeetzenApp = () => {
             gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
             gap: '2rem'
           }}>
-            {[
-              {
-                name: 'Deutsche Bracke',
-                description: 'Spezialist für Nachsuche und Spurarbeit. Zuverlässiger Partner bei der Nachsuche auf verletztes Wild.',
-                eigenschaften: ['Ausgezeichneter Spürsinn', 'Ruhiges Wesen', 'Ausdauernd', 'Führig']
-              },
-              {
-                name: 'Brandlbracke',
-                description: 'Vielseitiger Jagdhelfer für alle Wildarten. Besonders geeignet für die Jagd im Gebirge und schwierigem Gelände.',
-                eigenschaften: ['Vielseitig einsetzbar', 'Trittsicher', 'Spurlaut', 'Robust']
-              },
-              {
-                name: 'Alpenländische Dachsbracke',
-                description: 'Experte für schwieriges Gelände und Nachsuche. Kompakter, wendiger Jagdhund mit ausgezeichneter Nase.',
-                eigenschaften: ['Kompakt und wendig', 'Hervorragende Nase', 'Geländegängig', 'Zuverlässig']
-              }
-            ].map((hund, index) => (
-              <div key={index} style={{
-                backgroundColor: '#f8f9fa',
-                padding: '2rem',
-                borderRadius: '12px',
-                border: '2px solid #e9ecef',
-                transition: 'all 0.3s ease'
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.borderColor = '#2d5a27'
-                e.currentTarget.style.backgroundColor = '#f0f8f0'
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.borderColor = '#e9ecef'
-                e.currentTarget.style.backgroundColor = '#f8f9fa'
-              }}
-              >
-                <h3 style={{
-                  fontSize: '1.8rem',
-                  marginBottom: '1rem',
-                  color: '#2d5a27'
-                }}>
-                  {hund.name}
-                </h3>
-                <p style={{
-                  marginBottom: '1.5rem',
-                  color: '#666'
-                }}>
-                  {hund.description}
-                </p>
-                <h4 style={{
-                  marginBottom: '1rem',
-                  color: '#2d5a27'
-                }}>
-                  Eigenschaften:
-                </h4>
-                <ul style={{
-                  listStyle: 'none',
-                  padding: '0'
-                }}>
-                  {hund.eigenschaften.map((eigenschaft, i) => (
-                    <li key={i} style={{
-                      padding: '0.3rem 0',
-                      color: '#555'
-                    }}>
-                      ✓ {eigenschaft}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+            {/* Deutsche Bracke */}
+            <div style={{
+              backgroundColor: '#f8f9fa',
+              padding: '2rem',
+              borderRadius: '12px',
+              border: '2px solid #e9ecef'
+            }}>
+              <h3 style={{
+                fontSize: '1.8rem',
+                marginBottom: '1rem',
+                color: '#2d5a27'
+              }}>
+                🐕 Deutsche Bracke
+              </h3>
+              <p style={{
+                marginBottom: '1.5rem',
+                color: '#666'
+              }}>
+                Spezialist für Nachsuche und Spurarbeit. Zuverlässiger Partner bei der Nachsuche auf verletztes Wild.
+              </p>
+              <h4 style={{
+                marginBottom: '1rem',
+                color: '#2d5a27'
+              }}>
+                Eigenschaften:
+              </h4>
+              <ul style={{
+                listStyle: 'none',
+                padding: '0'
+              }}>
+                <li style={{ padding: '0.3rem 0', color: '#555' }}>✓ Ausgezeichneter Spürsinn</li>
+                <li style={{ padding: '0.3rem 0', color: '#555' }}>✓ Ruhiges Wesen</li>
+                <li style={{ padding: '0.3rem 0', color: '#555' }}>✓ Ausdauernd</li>
+                <li style={{ padding: '0.3rem 0', color: '#555' }}>✓ Führig</li>
+              </ul>
+            </div>
+
+            {/* Brandlbracke */}
+            <div style={{
+              backgroundColor: '#f8f9fa',
+              padding: '2rem',
+              borderRadius: '12px',
+              border: '2px solid #e9ecef'
+            }}>
+              <h3 style={{
+                fontSize: '1.8rem',
+                marginBottom: '1rem',
+                color: '#2d5a27'
+              }}>
+                🐕 Brandlbracke
+              </h3>
+              <p style={{
+                marginBottom: '1.5rem',
+                color: '#666'
+              }}>
+                Vielseitiger Jagdhelfer für alle Wildarten. Besonders geeignet für die Jagd im Gebirge und schwierigem Gelände.
+              </p>
+              <h4 style={{
+                marginBottom: '1rem',
+                color: '#2d5a27'
+              }}>
+                Eigenschaften:
+              </h4>
+              <ul style={{
+                listStyle: 'none',
+                padding: '0'
+              }}>
+                <li style={{ padding: '0.3rem 0', color: '#555' }}>✓ Vielseitig einsetzbar</li>
+                <li style={{ padding: '0.3rem 0', color: '#555' }}>✓ Trittsicher</li>
+                <li style={{ padding: '0.3rem 0', color: '#555' }}>✓ Spurlaut</li>
+                <li style={{ padding: '0.3rem 0', color: '#555' }}>✓ Robust</li>
+              </ul>
+            </div>
+
+            {/* Alpenländische Dachsbracke */}
+            <div style={{
+              backgroundColor: '#f8f9fa',
+              padding: '2rem',
+              borderRadius: '12px',
+              border: '2px solid #e9ecef'
+            }}>
+              <h3 style={{
+                fontSize: '1.8rem',
+                marginBottom: '1rem',
+                color: '#2d5a27'
+              }}>
+                🐕 Alpenländische Dachsbracke
+              </h3>
+              <p style={{
+                marginBottom: '1.5rem',
+                color: '#666'
+              }}>
+                Experte für schwieriges Gelände und Nachsuche. Kompakter, wendiger Jagdhund mit ausgezeichneter Nase.
+              </p>
+              <h4 style={{
+                marginBottom: '1rem',
+                color: '#2d5a27'
+              }}>
+                Eigenschaften:
+              </h4>
+              <ul style={{
+                listStyle: 'none',
+                padding: '0'
+              }}>
+                <li style={{ padding: '0.3rem 0', color: '#555' }}>✓ Kompakt und wendig</li>
+                <li style={{ padding: '0.3rem 0', color: '#555' }}>✓ Hervorragende Nase</li>
+                <li style={{ padding: '0.3rem 0', color: '#555' }}>✓ Geländegängig</li>
+                <li style={{ padding: '0.3rem 0', color: '#555' }}>✓ Zuverlässig</li>
+              </ul>
+            </div>
           </div>
         </div>
       </section>
@@ -361,83 +414,163 @@ const JagdrevierWeetzenApp = () => {
             gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
             gap: '2rem'
           }}>
-            {[
-              {
-                kategorie: 'Rehwild',
-                icon: '🦌',
-                beschreibung: 'Hauptwildart unseres Reviers mit gesunden Beständen',
-                details: ['Rehböcke', 'Ricken', 'Kitze', 'Ganzjährige Beobachtung']
-              },
-              {
-                kategorie: 'Schwarzwild',
-                icon: '🐗',
-                beschreibung: 'Wildschweine in verschiedenen Altersklassen',
-                details: ['Keiler', 'Bachen', 'Frischlinge', 'Überläufer']
-              },
-              {
-                kategorie: 'Federwild',
-                icon: '🦆',
-                beschreibung: 'Vielfältige Vogelarten in unserem Revier',
-                details: ['Stockenten', 'Wildgänse', 'Fasane', 'Rebhühner']
-              },
-              {
-                kategorie: 'Haarwild',
-                icon: '🐰',
-                beschreibung: 'Weitere Haarwildarten des Reviers',
-                details: ['Feldhasen', 'Kaninchen', 'Dachse', 'Füchse']
-              }
-            ].map((wildart, index) => (
-              <div key={index} style={{
-                backgroundColor: 'white',
-                padding: '2rem',
-                borderRadius: '12px',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-                textAlign: 'center',
-                transition: 'transform 0.3s ease'
-              }}
-              onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
-              onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-              >
-                <div style={{
-                  fontSize: '4rem',
-                  marginBottom: '1rem'
-                }}>
-                  {wildart.icon}
-                </div>
-                <h3 style={{
-                  fontSize: '1.8rem',
-                  marginBottom: '1rem',
-                  color: '#2d5a27'
-                }}>
-                  {wildart.kategorie}
-                </h3>
-                <p style={{
-                  marginBottom: '1.5rem',
-                  color: '#666'
-                }}>
-                  {wildart.beschreibung}
-                </p>
-                <ul style={{
-                  listStyle: 'none',
-                  padding: '0'
-                }}>
-                  {wildart.details.map((detail, i) => (
-                    <li key={i} style={{
-                      padding: '0.3rem 0',
-                      color: '#555'
-                    }}>
-                      • {detail}
-                    </li>
-                  ))}
-                </ul>
+            {/* Rehwild */}
+            <div style={{
+              backgroundColor: 'white',
+              padding: '2rem',
+              borderRadius: '12px',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+              textAlign: 'center'
+            }}>
+              <div style={{
+                fontSize: '4rem',
+                marginBottom: '1rem'
+              }}>
+                🦌
               </div>
-            ))}
+              <h3 style={{
+                fontSize: '1.8rem',
+                marginBottom: '1rem',
+                color: '#2d5a27'
+              }}>
+                Rehwild
+              </h3>
+              <p style={{
+                marginBottom: '1.5rem',
+                color: '#666'
+              }}>
+                Hauptwildart unseres Reviers mit gesunden Beständen
+              </p>
+              <ul style={{
+                listStyle: 'none',
+                padding: '0'
+              }}>
+                <li style={{ padding: '0.3rem 0', color: '#555' }}>• Rehböcke</li>
+                <li style={{ padding: '0.3rem 0', color: '#555' }}>• Ricken</li>
+                <li style={{ padding: '0.3rem 0', color: '#555' }}>• Kitze</li>
+                <li style={{ padding: '0.3rem 0', color: '#555' }}>• Ganzjährige Beobachtung</li>
+              </ul>
+            </div>
+
+            {/* Schwarzwild */}
+            <div style={{
+              backgroundColor: 'white',
+              padding: '2rem',
+              borderRadius: '12px',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+              textAlign: 'center'
+            }}>
+              <div style={{
+                fontSize: '4rem',
+                marginBottom: '1rem'
+              }}>
+                🐗
+              </div>
+              <h3 style={{
+                fontSize: '1.8rem',
+                marginBottom: '1rem',
+                color: '#2d5a27'
+              }}>
+                Schwarzwild
+              </h3>
+              <p style={{
+                marginBottom: '1.5rem',
+                color: '#666'
+              }}>
+                Wildschweine in verschiedenen Altersklassen
+              </p>
+              <ul style={{
+                listStyle: 'none',
+                padding: '0'
+              }}>
+                <li style={{ padding: '0.3rem 0', color: '#555' }}>• Keiler</li>
+                <li style={{ padding: '0.3rem 0', color: '#555' }}>• Bachen</li>
+                <li style={{ padding: '0.3rem 0', color: '#555' }}>• Frischlinge</li>
+                <li style={{ padding: '0.3rem 0', color: '#555' }}>• Überläufer</li>
+              </ul>
+            </div>
+
+            {/* Federwild */}
+            <div style={{
+              backgroundColor: 'white',
+              padding: '2rem',
+              borderRadius: '12px',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+              textAlign: 'center'
+            }}>
+              <div style={{
+                fontSize: '4rem',
+                marginBottom: '1rem'
+              }}>
+                🦆
+              </div>
+              <h3 style={{
+                fontSize: '1.8rem',
+                marginBottom: '1rem',
+                color: '#2d5a27'
+              }}>
+                Federwild
+              </h3>
+              <p style={{
+                marginBottom: '1.5rem',
+                color: '#666'
+              }}>
+                Vielfältige Vogelarten in unserem Revier
+              </p>
+              <ul style={{
+                listStyle: 'none',
+                padding: '0'
+              }}>
+                <li style={{ padding: '0.3rem 0', color: '#555' }}>• Stockenten</li>
+                <li style={{ padding: '0.3rem 0', color: '#555' }}>• Wildgänse</li>
+                <li style={{ padding: '0.3rem 0', color: '#555' }}>• Fasane</li>
+                <li style={{ padding: '0.3rem 0', color: '#555' }}>• Rebhühner</li>
+              </ul>
+            </div>
+
+            {/* Haarwild */}
+            <div style={{
+              backgroundColor: 'white',
+              padding: '2rem',
+              borderRadius: '12px',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+              textAlign: 'center'
+            }}>
+              <div style={{
+                fontSize: '4rem',
+                marginBottom: '1rem'
+              }}>
+                🐰
+              </div>
+              <h3 style={{
+                fontSize: '1.8rem',
+                marginBottom: '1rem',
+                color: '#2d5a27'
+              }}>
+                Haarwild
+              </h3>
+              <p style={{
+                marginBottom: '1.5rem',
+                color: '#666'
+              }}>
+                Weitere Haarwildarten des Reviers
+              </p>
+              <ul style={{
+                listStyle: 'none',
+                padding: '0'
+              }}>
+                <li style={{ padding: '0.3rem 0', color: '#555' }}>• Feldhasen</li>
+                <li style={{ padding: '0.3rem 0', color: '#555' }}>• Kaninchen</li>
+                <li style={{ padding: '0.3rem 0', color: '#555' }}>• Dachse</li>
+                <li style={{ padding: '0.3rem 0', color: '#555' }}>• Füchse</li>
+              </ul>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Prädatoren Section */}
-      <section id="praedatoren" style={{
+      {/* Prädatorenmanagement Section */}
+      <section style={{
         padding: '5rem 2rem',
         backgroundColor: 'white'
       }}>
@@ -471,86 +604,134 @@ const JagdrevierWeetzenApp = () => {
             gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
             gap: '2rem'
           }}>
-            {[
-              {
-                name: 'Fuchs',
-                icon: '🦊',
-                management: 'Regulierung zum Schutz des Niederwildes und der Bodenbrüter',
-                methoden: ['Ansitzjagd', 'Fallenjagd', 'Baujagd']
-              },
-              {
-                name: 'Dachs',
-                icon: '🦡',
-                management: 'Bestandskontrolle und Habitatmanagement',
-                methoden: ['Ansitzjagd', 'Baujagd', 'Monitoring']
-              },
-              {
-                name: 'Marder',
-                icon: '🦫',
-                management: 'Schutz der Bodenbrüter und Niederwildbestände',
-                methoden: ['Fallenjagd', 'Lebendfallen', 'Monitoring']
-              },
-              {
-                name: 'Waschbär',
-                icon: '🦝',
-                management: 'Management invasiver Arten zum Ökosystemschutz',
-                methoden: ['Fallenjagd', 'Ansitzjagd', 'Bestandserfassung']
-              },
-              {
-                name: 'Nutria',
-                icon: '🦫',
-                management: 'Kontrolle invasiver Arten an Gewässern',
-                methoden: ['Fallenjagd', 'Ansitzjagd', 'Habitatmanagement']
-              }
-            ].map((praedator, index) => (
-              <div key={index} style={{
-                backgroundColor: '#f8f9fa',
-                padding: '1.5rem',
-                borderRadius: '12px',
-                border: '1px solid #e9ecef'
+            {/* Fuchs */}
+            <div style={{
+              backgroundColor: '#f8f9fa',
+              padding: '1.5rem',
+              borderRadius: '12px',
+              border: '1px solid #e9ecef'
+            }}>
+              <div style={{
+                textAlign: 'center',
+                fontSize: '3rem',
+                marginBottom: '1rem'
               }}>
-                <div style={{
-                  textAlign: 'center',
-                  fontSize: '3rem',
-                  marginBottom: '1rem'
-                }}>
-                  {praedator.icon}
-                </div>
-                <h3 style={{
-                  fontSize: '1.5rem',
-                  marginBottom: '1rem',
-                  color: '#2d5a27',
-                  textAlign: 'center'
-                }}>
-                  {praedator.name}
-                </h3>
-                <p style={{
-                  marginBottom: '1rem',
-                  color: '#666',
-                  fontSize: '0.9rem'
-                }}>
-                  {praedator.management}
-                </p>
-                <div>
-                  <strong style={{ color: '#2d5a27', fontSize: '0.9rem' }}>Methoden:</strong>
-                  <ul style={{
-                    listStyle: 'none',
-                    padding: '0',
-                    marginTop: '0.5rem'
-                  }}>
-                    {praedator.methoden.map((methode, i) => (
-                      <li key={i} style={{
-                        padding: '0.2rem 0',
-                        color: '#555',
-                        fontSize: '0.85rem'
-                      }}>
-                        • {methode}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                🦊
               </div>
-            ))}
+              <h3 style={{
+                fontSize: '1.5rem',
+                marginBottom: '1rem',
+                color: '#2d5a27',
+                textAlign: 'center'
+              }}>
+                Fuchs
+              </h3>
+              <p style={{
+                marginBottom: '1rem',
+                color: '#666',
+                fontSize: '0.9rem'
+              }}>
+                Regulierung zum Schutz des Niederwildes und der Bodenbrüter
+              </p>
+              <div>
+                <strong style={{ color: '#2d5a27', fontSize: '0.9rem' }}>Methoden:</strong>
+                <ul style={{
+                  listStyle: 'none',
+                  padding: '0',
+                  marginTop: '0.5rem'
+                }}>
+                  <li style={{ padding: '0.2rem 0', color: '#555', fontSize: '0.85rem' }}>• Ansitzjagd</li>
+                  <li style={{ padding: '0.2rem 0', color: '#555', fontSize: '0.85rem' }}>• Fallenjagd</li>
+                  <li style={{ padding: '0.2rem 0', color: '#555', fontSize: '0.85rem' }}>• Baujagd</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Dachs */}
+            <div style={{
+              backgroundColor: '#f8f9fa',
+              padding: '1.5rem',
+              borderRadius: '12px',
+              border: '1px solid #e9ecef'
+            }}>
+              <div style={{
+                textAlign: 'center',
+                fontSize: '3rem',
+                marginBottom: '1rem'
+              }}>
+                🦡
+              </div>
+              <h3 style={{
+                fontSize: '1.5rem',
+                marginBottom: '1rem',
+                color: '#2d5a27',
+                textAlign: 'center'
+              }}>
+                Dachs
+              </h3>
+              <p style={{
+                marginBottom: '1rem',
+                color: '#666',
+                fontSize: '0.9rem'
+              }}>
+                Bestandskontrolle und Habitatmanagement
+              </p>
+              <div>
+                <strong style={{ color: '#2d5a27', fontSize: '0.9rem' }}>Methoden:</strong>
+                <ul style={{
+                  listStyle: 'none',
+                  padding: '0',
+                  marginTop: '0.5rem'
+                }}>
+                  <li style={{ padding: '0.2rem 0', color: '#555', fontSize: '0.85rem' }}>• Ansitzjagd</li>
+                  <li style={{ padding: '0.2rem 0', color: '#555', fontSize: '0.85rem' }}>• Baujagd</li>
+                  <li style={{ padding: '0.2rem 0', color: '#555', fontSize: '0.85rem' }}>• Monitoring</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Marder */}
+            <div style={{
+              backgroundColor: '#f8f9fa',
+              padding: '1.5rem',
+              borderRadius: '12px',
+              border: '1px solid #e9ecef'
+            }}>
+              <div style={{
+                textAlign: 'center',
+                fontSize: '3rem',
+                marginBottom: '1rem'
+              }}>
+                🦫
+              </div>
+              <h3 style={{
+                fontSize: '1.5rem',
+                marginBottom: '1rem',
+                color: '#2d5a27',
+                textAlign: 'center'
+              }}>
+                Marder
+              </h3>
+              <p style={{
+                marginBottom: '1rem',
+                color: '#666',
+                fontSize: '0.9rem'
+              }}>
+                Schutz der Bodenbrüter und Niederwildbestände
+              </p>
+              <div>
+                <strong style={{ color: '#2d5a27', fontSize: '0.9rem' }}>Methoden:</strong>
+                <ul style={{
+                  listStyle: 'none',
+                  padding: '0',
+                  marginTop: '0.5rem'
+                }}>
+                  <li style={{ padding: '0.2rem 0', color: '#555', fontSize: '0.85rem' }}>• Fallenjagd</li>
+                  <li style={{ padding: '0.2rem 0', color: '#555', fontSize: '0.85rem' }}>• Lebendfallen</li>
+                  <li style={{ padding: '0.2rem 0', color: '#555', fontSize: '0.85rem' }}>• Monitoring</li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -623,10 +804,10 @@ const JagdrevierWeetzenApp = () => {
             borderRadius: '12px'
           }}>
             <h3 style={{ marginBottom: '1rem' }}>
-              ✅ Website erfolgreich geladen
+              ✅ Professionelle Jagdrevier-Website
             </h3>
             <p style={{ opacity: '0.8' }}>
-              <strong>Status:</strong> Professionelle Jagdrevier-Website aktiv | 
+              <strong>Status:</strong> Vollständig geladen | 
               <strong>Datum:</strong> {new Date().toLocaleString('de-DE')} | 
               <strong>Bereit für:</strong> Alfahosting Upload
             </p>
@@ -660,7 +841,7 @@ function initApp() {
     })()
     
     const root = createRoot(container)
-    root.render(<JagdrevierWeetzenApp />)
+    root.render(<JagdrevierWeetzenProfessional />)
     console.log('✅ Professionelle Jagdrevier Weetzen Website geladen')
   } catch (error) {
     console.error('❌ Fehler beim Laden:', error)
