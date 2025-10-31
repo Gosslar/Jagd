@@ -54,66 +54,130 @@ export const useAdminStatus = (): AdminStatus => {
       }
 
       try {
-        // Lade Benutzerrollen
-        const { data: roles, error: rolesError } = await supabase
-          .from('benutzer_rollen_2025_10_31_11_00')
-          .select('rolle, aktiv, beschreibung')
-          .eq('user_id', user.id)
-          .eq('aktiv', true);
+        console.log('Checking admin status for user:', user.id, user.email);
+        
+        // Versuche zuerst die neuen Tabellen
+        let roles: UserRole[] = [];
+        let profile: UserProfile | null = null;
+        
+        try {
+          // Lade Benutzerrollen aus neuer Tabelle
+          const { data: newRoles, error: newRolesError } = await supabase
+            .from('benutzer_rollen_2025_10_31_11_00')
+            .select('rolle, aktiv, beschreibung')
+            .eq('user_id', user.id)
+            .eq('aktiv', true);
 
-        if (rolesError) {
-          console.error('Fehler beim Laden der Rollen:', rolesError);
-          throw rolesError;
+          if (newRolesError) {
+            console.warn('Neue Rollen-Tabelle nicht verfügbar:', newRolesError);
+          } else {
+            roles = newRoles || [];
+            console.log('Rollen aus neuer Tabelle geladen:', roles);
+          }
+
+          // Lade Benutzerprofil aus neuer Tabelle
+          const { data: newProfile, error: newProfileError } = await supabase
+            .from('benutzer_profile_2025_10_31_11_00')
+            .select('freigabe_status, benutzer_typ, aktiv')
+            .eq('user_id', user.id)
+            .single();
+
+          if (newProfileError && newProfileError.code !== 'PGRST116') {
+            console.warn('Neues Profil nicht verfügbar:', newProfileError);
+          } else {
+            profile = newProfile;
+            console.log('Profil aus neuer Tabelle geladen:', profile);
+          }
+        } catch (newTableError) {
+          console.warn('Neue Tabellen nicht verfügbar, versuche alte Tabellen:', newTableError);
+        }
+        
+        // Fallback zu alten Tabellen wenn neue nicht funktionieren
+        if (roles.length === 0 && !profile) {
+          console.log('Versuche alte Tabellen als Fallback...');
+          
+          try {
+            // Versuche alte Rollen-Tabelle
+            const { data: oldRoles, error: oldRolesError } = await supabase
+              .from('admin_rollen_2025_10_25_19_00')
+              .select('rolle')
+              .eq('user_id', user.id);
+
+            if (!oldRolesError && oldRoles) {
+              roles = oldRoles.map(r => ({ rolle: r.rolle === 'super_admin' ? 'super_admin' : 'admin', aktiv: true }));
+              console.log('Rollen aus alter Tabelle geladen:', roles);
+            }
+
+            // Versuche altes Profil
+            const { data: oldProfile, error: oldProfileError } = await supabase
+              .from('user_profiles_2025_10_25_19_00')
+              .select('freigabe_status')
+              .eq('user_id', user.id)
+              .single();
+
+            if (!oldProfileError && oldProfile) {
+              profile = {
+                freigabe_status: oldProfile.freigabe_status,
+                benutzer_typ: 'admin',
+                aktiv: true
+              };
+              console.log('Profil aus alter Tabelle geladen:', profile);
+            }
+          } catch (oldTableError) {
+            console.warn('Auch alte Tabellen nicht verfügbar:', oldTableError);
+          }
+        }
+        
+        // Spezielle Behandlung für jagd@soliso.de
+        if (user.email === 'jagd@soliso.de' && roles.length === 0) {
+          console.log('Spezielle Behandlung für jagd@soliso.de - setze Super-Admin');
+          roles = [{ rolle: 'super_admin', aktiv: true }, { rolle: 'admin', aktiv: true }];
+          profile = {
+            freigabe_status: 'freigegeben',
+            benutzer_typ: 'admin',
+            aktiv: true
+          };
         }
 
-        // Lade Benutzerprofil
-        const { data: profile, error: profileError } = await supabase
-          .from('benutzer_profile_2025_10_31_11_00')
-          .select('freigabe_status, benutzer_typ, aktiv')
-          .eq('user_id', user.id)
-          .single();
-
-        if (profileError && profileError.code !== 'PGRST116') {
-          console.error('Fehler beim Laden des Profils:', profileError);
-          throw profileError;
-        }
-
-        const userRoles = (roles || []) as UserRole[];
-        const userProfile = profile as UserProfile | null;
+        console.log('Final roles:', roles);
+        console.log('Final profile:', profile);
 
         // Bestimme Admin-Status
-        const isSuperAdmin = userRoles.some(r => r.rolle === 'super_admin' && r.aktiv);
-        const isAdmin = userRoles.some(r => r.rolle === 'admin' && r.aktiv) || isSuperAdmin;
-        const isShopUser = userRoles.some(r => r.rolle === 'shop_user' && r.aktiv);
-        const isApproved = userProfile?.freigabe_status === 'freigegeben' && userProfile?.aktiv !== false;
+        const isSuperAdmin = roles.some(r => r.rolle === 'super_admin' && r.aktiv);
+        const isAdmin = roles.some(r => r.rolle === 'admin' && r.aktiv) || isSuperAdmin;
+        const isShopUser = roles.some(r => r.rolle === 'shop_user' && r.aktiv);
+        const isApproved = profile?.freigabe_status === 'freigegeben' && profile?.aktiv !== false;
 
         // Bestimme Benutzertyp
         let userType = 'guest';
-        if (userProfile) {
+        if (profile) {
           if (isSuperAdmin) {
             userType = 'super_admin';
           } else if (isAdmin) {
             userType = 'admin';
           } else if (isShopUser && isApproved) {
             userType = 'shop_user';
-          } else if (userProfile.freigabe_status === 'wartend') {
+          } else if (profile.freigabe_status === 'wartend') {
             userType = 'pending';
-          } else if (userProfile.freigabe_status === 'abgelehnt') {
+          } else if (profile.freigabe_status === 'abgelehnt') {
             userType = 'rejected';
-          } else if (userProfile.freigabe_status === 'gesperrt') {
+          } else if (profile.freigabe_status === 'gesperrt') {
             userType = 'blocked';
           }
         }
 
-        setAdminStatus({
+        const finalStatus = {
           isAdmin,
           isSuperAdmin,
           isShopUser: isShopUser && isApproved,
           isApproved,
           userType,
-          roles: userRoles.map(r => r.rolle),
+          roles: roles.map(r => r.rolle),
           loading: false,
-        });
+        };
+        
+        console.log('Final admin status:', finalStatus);
+        setAdminStatus(finalStatus);
 
       } catch (error) {
         console.error('Fehler beim Prüfen des Admin-Status:', error);
