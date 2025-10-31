@@ -185,9 +185,9 @@ export const WildfleischShop: React.FC = () => {
       
       const gesamtpreis = getTotal();
       
-      // Direkte Datenbank-Speicherung statt Edge Function
+      // Direkte Datenbank-Speicherung mit einfachen Tabellen
       const { data: bestellungData, error: bestellungError } = await supabase
-        .from('shop_bestellungen_2025_10_27_14_00')
+        .from('simple_bestellungen_2025_10_31_12_00')
         .insert({
           name: formData.name,
           email: formData.email,
@@ -195,8 +195,7 @@ export const WildfleischShop: React.FC = () => {
           adresse: formData.address,
           nachricht: formData.nachricht,
           gesamtpreis: gesamtpreis,
-          status: 'neu',
-          erstellt_am: new Date().toISOString()
+          status: 'neu'
         })
         .select()
         .single();
@@ -218,14 +217,14 @@ export const WildfleischShop: React.FC = () => {
       }));
       
       const { error: positionenError } = await supabase
-        .from('shop_bestellpositionen_2025_10_27_14_00')
+        .from('simple_bestellpositionen_2025_10_31_12_00')
         .insert(bestellpositionen);
       
       if (positionenError) {
         console.error('Fehler beim Erstellen der Bestellpositionen:', positionenError);
         // Bestellung löschen falls Positionen fehlschlagen
         await supabase
-          .from('shop_bestellungen_2025_10_27_14_00')
+          .from('simple_bestellungen_2025_10_31_12_00')
           .delete()
           .eq('id', bestellungData.id);
         throw new Error(`Bestellpositionen konnten nicht erstellt werden: ${positionenError.message}`);
