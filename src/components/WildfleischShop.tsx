@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthProvider';
+// import { useAuth } from '@/contexts/AuthProvider'; // Nicht mehr benötigt für Gast-Shop
 import { 
   ShoppingCart, 
   Plus, 
@@ -57,7 +57,7 @@ interface WarenkorbItem {
 
 export const WildfleischShop = () => {
   const { toast } = useToast();
-  const { user } = useAuth();
+  // const { user } = useAuth(); // Nicht mehr benötigt für Gast-Shop
   
   // Verfügbarkeitsstatus berechnen
   const getVerfuegbarkeitsStatus = (lagerbestand: number, verfuegbar: boolean) => {
@@ -105,15 +105,15 @@ export const WildfleischShop = () => {
     loadShopData();
   }, []);
 
-  useEffect(() => {
-    if (user) {
-      setCheckoutForm(prev => ({
-        ...prev,
-        kunde_name: user.user_metadata?.full_name || '',
-        kunde_email: user.email || ''
-      }));
-    }
-  }, [user]);
+  // useEffect(() => {
+  //   if (user) {
+  //     setCheckoutForm(prev => ({
+  //       ...prev,
+  //       kunde_name: user.user_metadata?.full_name || '',
+  //       kunde_email: user.email || ''
+  //     }));
+  //   }
+  // }, [user]); // Nicht mehr benötigt für Gast-Shop
 
   const loadShopData = async () => {
     try {
@@ -254,7 +254,7 @@ export const WildfleischShop = () => {
       const { data: bestellung, error: bestellungError } = await supabase
         .from('shop_bestellungen_2025_10_27_14_00')
         .insert({
-          kunde_id: user?.id || null,
+          kunde_id: null, // Gast-Bestellung
           kunde_name: checkoutForm.kunde_name,
           kunde_email: checkoutForm.kunde_email,
           kunde_telefon: checkoutForm.kunde_telefon,
