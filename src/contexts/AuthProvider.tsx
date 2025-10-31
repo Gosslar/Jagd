@@ -92,8 +92,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUp = async (email: string, password: string, userData?: { full_name?: string }) => {
     try {
-      // Verwende Edge Function für Registrierung ohne E-Mail-Bestätigung
-      const { data, error } = await supabase.functions.invoke('register_user_without_email_2025_10_28_12_00', {
+      // Verwende verbesserte Edge Function für Registrierung
+      const { data, error } = await supabase.functions.invoke('improved_user_registration_2025_10_31_11_00', {
         body: {
           email,
           password,

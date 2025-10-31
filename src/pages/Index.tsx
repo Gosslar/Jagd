@@ -16,6 +16,7 @@ import { AuthProvider, useAuth } from '@/contexts/AuthProvider';
 import { ShopVerwaltung } from '@/components/ShopVerwaltung';
 import { ShopBestellVerwaltung } from '@/components/ShopBestellVerwaltung';
 import { BenutzerVerwaltung } from '@/components/BenutzerVerwaltung';
+import { ErweiterteBenutzerverwaltung } from '@/components/ErweiterteBenutzerverwaltung';
 import { BlogVerwaltungSimple } from '@/components/BlogVerwaltungSimple';
 import { KontaktVerwaltung } from '@/components/KontaktVerwaltung';
 import { VeranstaltungsVerwaltung } from '@/components/VeranstaltungsVerwaltung';
@@ -50,7 +51,7 @@ const IndexContent = () => {
           <VeranstaltungsVerwaltung />
           <BlogVerwaltungSimple />
           <KontaktVerwaltung />
-          <BenutzerVerwaltung />
+          <ErweiterteBenutzerverwaltung />
         </>
       )}
       
