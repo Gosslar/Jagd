@@ -71,22 +71,52 @@ export const ShopBestellVerwaltung = () => {
     try {
       setLoading(true);
       
-      // Bestellungen laden
+      // Bestellungen laden aus neuer einfacher Tabelle
+      console.log('ShopBestellVerwaltung: Loading orders from simple_bestellungen_2025_10_31_12_00...');
       const { data: bestellungenData, error: bestellungenError } = await supabase
-        .from('shop_bestellungen_2025_10_27_14_00')
+        .from('simple_bestellungen_2025_10_31_12_00')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('erstellt_am', { ascending: false });
+      
+      console.log('ShopBestellVerwaltung: Orders loaded:', bestellungenData?.length || 0, 'orders');
       
       if (bestellungenError) throw bestellungenError;
-      setBestellungen(bestellungenData || []);
+      
+      // Konvertiere einfache Bestellungen zu ShopBestellung Format
+      const convertedBestellungen: ShopBestellung[] = (bestellungenData || []).map(order => ({
+        id: order.id,
+        bestellnummer: `B-${order.id.substring(0, 8)}`,
+        kunde_id: order.id,
+        kunde_name: order.name,
+        kunde_email: order.email,
+        kunde_telefon: order.telefon || '',
+        abholung_datum: new Date().toISOString().split('T')[0],
+        abholung_uhrzeit: '10:00',
+        abholung_notiz: order.nachricht || '',
+        gesamtpreis: order.gesamtpreis || 0,
+        status: (order.status === 'neu' ? 'neu' : 
+                order.status === 'freigegeben' ? 'bestaetigt' : 
+                order.status === 'abgelehnt' ? 'storniert' : 'neu') as any,
+        zahlungsart: 'bar',
+        zahlungsstatus: 'offen' as any,
+        admin_notiz: '',
+        bearbeitet_von: '',
+        bearbeitet_am: '',
+        created_at: order.erstellt_am
+      }));
+      
+      setBestellungen(convertedBestellungen);
+      console.log('ShopBestellVerwaltung: Converted orders:', convertedBestellungen.length);
       
       // Bestellpositionen für alle Bestellungen laden
       if (bestellungenData && bestellungenData.length > 0) {
         const bestellungIds = bestellungenData.map(b => b.id);
         const { data: positionenData, error: positionenError } = await supabase
-          .from('shop_bestellpositionen_2025_10_27_14_00')
+          .from('simple_bestellpositionen_2025_10_31_12_00')
           .select('*')
           .in('bestellung_id', bestellungIds);
+        
+        console.log('ShopBestellVerwaltung: Positions loaded:', positionenData?.length || 0, 'positions');
         
         if (positionenError) throw positionenError;
         
@@ -295,9 +325,11 @@ export const ShopBestellVerwaltung = () => {
       }
       
       const { error } = await supabase
-        .from('shop_bestellungen_2025_10_27_14_00')
-        .update(updateData)
+        .from('simple_bestellungen_2025_10_31_12_00')
+        .update({ status: newStatus })
         .eq('id', bestellungId);
+      
+      console.log('ShopBestellVerwaltung: Status updated for order:', bestellungId, 'to:', newStatus);
       
       if (error) throw error;
       
