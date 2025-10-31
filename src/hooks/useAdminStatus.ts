@@ -2,18 +2,6 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
 
-interface UserRole {
-  rolle: string;
-  aktiv: boolean;
-  beschreibung?: string;
-}
-
-interface UserProfile {
-  freigabe_status: string;
-  benutzer_typ: string;
-  aktiv: boolean;
-}
-
 interface AdminStatus {
   isAdmin: boolean;
   isSuperAdmin: boolean;
@@ -56,113 +44,61 @@ export const useAdminStatus = (): AdminStatus => {
       try {
         console.log('Checking admin status for user:', user.id, user.email);
         
-        // Versuche die neue einfache Tabelle zuerst
-        let roles: UserRole[] = [];
-        let profile: UserProfile | null = null;
-        
-        try {
-          // Lade Benutzerrollen aus einfacher Tabelle (ohne Constraints)
-          const { data: simpleRoles, error: simpleRolesError } = await supabase
-            .from('simple_user_roles_2025_10_31_12_00')
-            .select('role')
-            .eq('user_id', user.id);
+        // Einfachste Lösung: Rolle direkt aus dem Profil laden
+        const { data: profile, error: profileError } = await supabase
+          .from('benutzer_profile_2025_10_31_11_00')
+          .select('freigabe_status, benutzer_typ, aktiv, rolle')
+          .eq('user_id', user.id)
+          .single();
 
-          if (simpleRolesError) {
-            console.warn('Einfache Rollen-Tabelle nicht verfügbar:', simpleRolesError);
-          } else {
-            roles = (simpleRoles || []).map(r => ({ rolle: r.role, aktiv: true }));
-            console.log('Rollen aus einfacher Tabelle geladen:', roles);
-          }
-
-          // Lade Benutzerprofil
-          const { data: newProfile, error: newProfileError } = await supabase
-            .from('benutzer_profile_2025_10_31_11_00')
-            .select('freigabe_status, benutzer_typ, aktiv')
-            .eq('user_id', user.id)
-            .single();
-
-          if (newProfileError && newProfileError.code !== 'PGRST116') {
-            console.warn('Profil nicht verfügbar:', newProfileError);
-          } else {
-            profile = newProfile;
-            console.log('Profil geladen:', profile);
-          }
-        } catch (newTableError) {
-          console.warn('Neue Tabellen nicht verfügbar, versuche alte Tabellen:', newTableError);
+        if (profileError && profileError.code !== 'PGRST116') {
+          console.warn('Profil nicht verfügbar:', profileError);
+          throw profileError;
         }
-        
-        // Fallback zu alten Tabellen wenn neue nicht funktionieren
-        if (roles.length === 0 && !profile) {
-          console.log('Versuche alte Tabellen als Fallback...');
-          
-          try {
-            // Versuche alte Rollen-Tabelle
-            const { data: oldRoles, error: oldRolesError } = await supabase
-              .from('admin_rollen_2025_10_25_19_00')
-              .select('rolle')
-              .eq('user_id', user.id);
 
-            if (!oldRolesError && oldRoles) {
-              roles = oldRoles.map(r => ({ rolle: r.rolle === 'super_admin' ? 'super_admin' : 'admin', aktiv: true }));
-              console.log('Rollen aus alter Tabelle geladen:', roles);
-            }
+        console.log('Profil mit Rolle geladen:', profile);
 
-            // Versuche altes Profil
-            const { data: oldProfile, error: oldProfileError } = await supabase
-              .from('user_profiles_2025_10_25_19_00')
-              .select('freigabe_status')
-              .eq('user_id', user.id)
-              .single();
-
-            if (!oldProfileError && oldProfile) {
-              profile = {
-                freigabe_status: oldProfile.freigabe_status,
-                benutzer_typ: 'admin',
-                aktiv: true
-              };
-              console.log('Profil aus alter Tabelle geladen:', profile);
-            }
-          } catch (oldTableError) {
-            console.warn('Auch alte Tabellen nicht verfügbar:', oldTableError);
-          }
-        }
-        
-        // Spezielle Behandlung für jagd@soliso.de
-        if (user.email === 'jagd@soliso.de' && roles.length === 0) {
+        // Fallback für jagd@soliso.de
+        if (user.email === 'jagd@soliso.de' && (!profile || !profile.rolle)) {
           console.log('Spezielle Behandlung für jagd@soliso.de - setze Super-Admin');
-          roles = [{ rolle: 'super_admin', aktiv: true }, { rolle: 'admin', aktiv: true }];
-          profile = {
-            freigabe_status: 'freigegeben',
-            benutzer_typ: 'admin',
-            aktiv: true
+          const finalStatus = {
+            isAdmin: true,
+            isSuperAdmin: true,
+            isShopUser: false,
+            isApproved: true,
+            userType: 'super_admin',
+            roles: ['super_admin'],
+            loading: false,
           };
+          setAdminStatus(finalStatus);
+          return;
         }
 
-        console.log('Final roles:', roles);
-        console.log('Final profile:', profile);
+        if (!profile) {
+          throw new Error('Kein Profil gefunden');
+        }
 
-        // Bestimme Admin-Status
-        const isSuperAdmin = roles.some(r => r.rolle === 'super_admin' && r.aktiv);
-        const isAdmin = roles.some(r => r.rolle === 'admin' && r.aktiv) || isSuperAdmin;
-        const isShopUser = roles.some(r => r.rolle === 'shop_user' && r.aktiv);
-        const isApproved = profile?.freigabe_status === 'freigegeben' && profile?.aktiv !== false;
+        // Bestimme Admin-Status basierend auf der Rolle im Profil
+        const userRole = profile.rolle || 'shop_user';
+        const isSuperAdmin = userRole === 'super_admin';
+        const isAdmin = userRole === 'admin' || isSuperAdmin;
+        const isShopUser = userRole === 'shop_user';
+        const isApproved = profile.freigabe_status === 'freigegeben' && profile.aktiv !== false;
 
         // Bestimme Benutzertyp
         let userType = 'guest';
-        if (profile) {
-          if (isSuperAdmin) {
-            userType = 'super_admin';
-          } else if (isAdmin) {
-            userType = 'admin';
-          } else if (isShopUser && isApproved) {
-            userType = 'shop_user';
-          } else if (profile.freigabe_status === 'wartend') {
-            userType = 'pending';
-          } else if (profile.freigabe_status === 'abgelehnt') {
-            userType = 'rejected';
-          } else if (profile.freigabe_status === 'gesperrt') {
-            userType = 'blocked';
-          }
+        if (isSuperAdmin) {
+          userType = 'super_admin';
+        } else if (isAdmin) {
+          userType = 'admin';
+        } else if (isShopUser && isApproved) {
+          userType = 'shop_user';
+        } else if (profile.freigabe_status === 'wartend') {
+          userType = 'pending';
+        } else if (profile.freigabe_status === 'abgelehnt') {
+          userType = 'rejected';
+        } else if (profile.freigabe_status === 'gesperrt') {
+          userType = 'blocked';
         }
 
         const finalStatus = {
@@ -171,7 +107,7 @@ export const useAdminStatus = (): AdminStatus => {
           isShopUser: isShopUser && isApproved,
           isApproved,
           userType,
-          roles: roles.map(r => r.rolle),
+          roles: [userRole],
           loading: false,
         };
         

@@ -75,19 +75,10 @@ export const ErweiterteBenutzerverwaltung: React.FC = () => {
 
       if (profilesError) throw profilesError;
 
-      // Lade Rollen für alle Benutzer aus einfacher Tabelle
-      const { data: roles, error: rolesError } = await supabase
-        .from('simple_user_roles_2025_10_31_12_00')
-        .select('user_id, role');
-
-      if (rolesError) throw rolesError;
-
-      // Kombiniere Profile mit Rollen
+      // Einfachste Lösung: Rolle ist bereits im Profil
       const usersWithRoles = (profiles || []).map(profile => ({
         ...profile,
-        roles: (roles || [])
-          .filter(role => role.user_id === profile.user_id)
-          .map(role => role.role)
+        roles: profile.rolle ? [profile.rolle] : []
       }));
 
       setUsers(usersWithRoles);
@@ -107,41 +98,22 @@ export const ErweiterteBenutzerverwaltung: React.FC = () => {
     try {
       console.log('Updating role for user:', userId, 'to:', newRole);
       
-      // Direkte Datenbank-Operationen ohne RPC
-      // 1. Lösche alle alten Rollen
-      const { error: deleteError } = await supabase
-        .from('simple_user_roles_2025_10_31_12_00')
-        .delete()
-        .eq('user_id', userId);
-      
-      if (deleteError) {
-        console.error('Fehler beim Löschen alter Rollen:', deleteError);
-        throw deleteError;
-      }
-      
-      // 2. Füge neue Rolle hinzu
-      const { error: insertError } = await supabase
-        .from('simple_user_roles_2025_10_31_12_00')
-        .insert({
-          user_id: userId,
-          role: newRole,
-          created_by: user?.id || null
-        });
-      
-      if (insertError) {
-        console.error('Fehler beim Hinzufügen neuer Rolle:', insertError);
-        throw insertError;
-      }
-      
-      // 3. Aktualisiere Benutzer-Typ im Profil
+      // Einfachste Lösung: Rolle direkt im Profil aktualisieren
       const benutzerTyp = (newRole === 'super_admin' || newRole === 'admin') ? 'admin' : 'shop_user';
-      const { error: updateError } = await supabase
+      
+      const { error } = await supabase
         .from('benutzer_profile_2025_10_31_11_00')
         .update({
+          rolle: newRole,
           benutzer_typ: benutzerTyp,
           aktualisiert_am: new Date().toISOString()
         })
         .eq('user_id', userId);
+      
+      if (error) {
+        console.error('Fehler beim Aktualisieren der Rolle:', error);
+        throw error;
+      }
       
       if (updateError) {
         console.error('Fehler beim Aktualisieren des Profils:', updateError);
