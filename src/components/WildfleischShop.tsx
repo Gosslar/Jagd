@@ -4,215 +4,161 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/hooks/use-toast';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
-import { 
-  ShoppingCart, 
-  Plus, 
-  Minus, 
-  Trash2, 
-  Package,
-  Clock,
-  MapPin,
-  Phone,
-  Mail,
-  CheckCircle,
-  AlertTriangle,
-  XCircle
-} from 'lucide-react';
+import { useAuth } from '@/contexts/AuthProvider';
+import { toast } from '@/hooks/use-toast';
+import { ShoppingCart, Plus, Minus, Trash2, Mail, Phone, MapPin, RefreshCw, Lock, LogIn, Info } from 'lucide-react';
 
-interface ShopKategorie {
+interface WildfleischItem {
   id: string;
-  name: string;
-  beschreibung: string;
-  reihenfolge: number;
-}
-
-interface ShopProdukt {
-  id: string;
-  kategorie_id: string;
-  name: string;
-  beschreibung: string;
-  kurzbeschreibung: string;
+  produkt_name: string;
+  kategorie: string;
   preis: number;
   einheit: string;
-  gewicht: number;
   lagerbestand: number;
-  verfuegbar: boolean;
-  hauptbild_url: string;
-  herkunft: string;
-  haltbarkeit_tage: number;
-  lagerung_hinweise: string;
-  zubereitungs_hinweise: string;
+  verfügbar: boolean;
 }
 
-interface WarenkorbItem {
-  produkt: ShopProdukt;
+interface BestellItem {
+  produkt: string;
+  preis: number;
   menge: number;
 }
 
-export const WildfleischShop = () => {
-  const { toast } = useToast();
-  
-  // Verfügbarkeitsstatus berechnen
-  const getVerfuegbarkeitsStatus = (lagerbestand: number) => {
-    if (lagerbestand === 0) {
-      return {
-        status: 'Ausverkauft',
-        variant: 'destructive' as const,
-        icon: XCircle,
-        className: 'text-red-600'
-      };
-    } else if (lagerbestand <= 5) {
-      return {
-        status: `Knapp (${lagerbestand})`,
-        variant: 'secondary' as const,
-        icon: AlertTriangle,
-        className: 'text-orange-600'
-      };
-    } else {
-      return {
-        status: 'Verfügbar',
-        variant: 'default' as const,
-        icon: CheckCircle,
-        className: 'text-green-600'
-      };
-    }
-  };
-  
-  const [kategorien, setKategorien] = useState<ShopKategorie[]>([]);
-  const [produkte, setProdukte] = useState<ShopProdukt[]>([]);
-  const [warenkorb, setWarenkorb] = useState<WarenkorbItem[]>([]);
+export const WildfleischShop: React.FC = () => {
+  const { user, loading: authLoading } = useAuth();
+  const [warenkorb, setWarenkorb] = useState<BestellItem[]>([]);
+  const [wildfleischSortiment, setWildfleischSortiment] = useState<WildfleischItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedKategorie, setSelectedKategorie] = useState<string>('alle');
-  const [checkoutDialog, setCheckoutDialog] = useState(false);
-  
-  // Checkout Form
-  const [checkoutForm, setCheckoutForm] = useState({
-    kunde_name: '',
-    kunde_email: '',
-    kunde_telefon: '',
-    abholung_datum: '',
-    abholung_uhrzeit: '10:00',
-    abholung_notiz: ''
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+    nachricht: ''
   });
+  const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    loadShopData();
-  }, []);
-
-  const loadShopData = async () => {
+  // Lade Sortiment aus Datenbank
+  const fetchSortiment = async () => {
     try {
-      setLoading(true);
-      
-      // Kategorien laden
-      const { data: kategorienData, error: kategorienError } = await supabase
-        .from('shop_kategorien_2025_10_27_14_00')
+      const { data, error } = await supabase
+        .from('wildfleisch_lager_2025_10_24_14_00')
         .select('*')
-        .order('reihenfolge');
-      
-      if (kategorienError) throw kategorienError;
-      setKategorien(kategorienData || []);
-      
-      // Produkte laden
-      const { data: produkteData, error: produkteError } = await supabase
-        .from('shop_produkte_2025_10_27_14_00')
-        .select('*')
-        .eq('verfuegbar', true)
-        .order('reihenfolge');
-      
-      if (produkteError) throw produkteError;
-      setProdukte(produkteData || []);
-      
-    } catch (error: any) {
-      console.error('Fehler beim Laden der Shop-Daten:', error);
-      toast({
-        title: "Fehler beim Laden",
-        description: "Shop-Daten konnten nicht geladen werden.",
-        variant: "destructive",
-      });
+        .order('reihenfolge', { ascending: true });
+
+      if (error) {
+        console.error('Fehler beim Laden des Sortiments:', error);
+        toast({
+          title: "Fehler",
+          description: "Sortiment konnte nicht geladen werden.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setWildfleischSortiment(data || []);
+    } catch (error) {
+      console.error('Unerwarteter Fehler:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  // Einfache Warenkorb-Funktionen
-  const addToWarenkorb = (produkt: ShopProdukt) => {
-    if (!produkt || produkt.lagerbestand <= 0) {
-      toast({
-        title: "Nicht verfügbar",
-        description: "Dieses Produkt ist nicht verfügbar.",
-        variant: "destructive",
-      });
-      return;
-    }
+  useEffect(() => {
+    fetchSortiment();
+  }, []);
 
-    const existingItem = warenkorb.find(item => item.produkt.id === produkt.id);
+  // Fülle Formular mit Benutzerdaten wenn angemeldet
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        name: user.user_metadata?.full_name || user.email?.split('@')[0] || '',
+        email: user.email || ''
+      }));
+    }
+  }, [user]);
+
+  const addToWarenkorb = (item: WildfleischItem) => {
+    const existingItem = warenkorb.find(w => w.produkt === item.produkt_name);
     
     if (existingItem) {
-      if (existingItem.menge >= produkt.lagerbestand) {
+      if (existingItem.menge >= item.lagerbestand) {
         toast({
           title: "Nicht genügend Lagerbestand",
-          description: `Nur noch ${produkt.lagerbestand} Stück verfügbar.`,
+          description: `Nur noch ${item.lagerbestand} Stück verfügbar.`,
           variant: "destructive",
         });
         return;
       }
-      
-      setWarenkorb(warenkorb.map(item =>
-        item.produkt.id === produkt.id
-          ? { ...item, menge: item.menge + 1 }
-          : item
+      setWarenkorb(warenkorb.map(w => 
+        w.produkt === item.produkt_name 
+          ? { ...w, menge: w.menge + 1 }
+          : w
       ));
     } else {
-      setWarenkorb([...warenkorb, { produkt, menge: 1 }]);
+      setWarenkorb([...warenkorb, {
+        produkt: item.produkt_name,
+        preis: item.preis,
+        menge: 1
+      }]);
     }
 
     toast({
       title: "Zum Warenkorb hinzugefügt",
-      description: `${produkt.name}`,
+      description: `${item.produkt_name}`,
     });
   };
 
-  const updateMenge = (produktId: string, newMenge: number) => {
+  const updateMenge = (produktName: string, newMenge: number) => {
     if (newMenge <= 0) {
-      setWarenkorb(warenkorb.filter(item => item.produkt.id !== produktId));
+      setWarenkorb(warenkorb.filter(item => item.produkt !== produktName));
       return;
     }
 
-    const produkt = produkte.find(p => p.id === produktId);
-    if (produkt && newMenge > produkt.lagerbestand) {
+    const item = wildfleischSortiment.find(w => w.produkt_name === produktName);
+    if (item && newMenge > item.lagerbestand) {
       toast({
         title: "Nicht genügend Lagerbestand",
-        description: `Nur noch ${produkt.lagerbestand} Stück verfügbar.`,
+        description: `Nur noch ${item.lagerbestand} Stück verfügbar.`,
         variant: "destructive",
       });
       return;
     }
 
-    setWarenkorb(warenkorb.map(item =>
-      item.produkt.id === produktId
-        ? { ...item, menge: newMenge }
-        : item
+    setWarenkorb(warenkorb.map(w => 
+      w.produkt === produktName 
+        ? { ...w, menge: newMenge }
+        : w
     ));
   };
 
-  const removeFromWarenkorb = (produktId: string) => {
-    setWarenkorb(warenkorb.filter(item => item.produkt.id !== produktId));
+  const removeFromWarenkorb = (produktName: string) => {
+    setWarenkorb(warenkorb.filter(item => item.produkt !== produktName));
   };
 
-  const getWarenkorbTotal = () => {
-    return warenkorb.reduce((total, item) => total + (item.produkt.preis * item.menge), 0);
+  const getTotal = () => {
+    return warenkorb.reduce((total, item) => total + (item.preis * item.menge), 0);
   };
 
   const getWarenkorbCount = () => {
     return warenkorb.reduce((total, item) => total + item.menge, 0);
   };
 
-  // Checkout-Funktionen
   const submitBestellung = async () => {
+    if (!user) {
+      toast({
+        title: "Anmeldung erforderlich",
+        description: "Bitte melden Sie sich an, um eine Bestellung aufzugeben.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (warenkorb.length === 0) {
       toast({
         title: "Warenkorb leer",
@@ -222,91 +168,74 @@ export const WildfleischShop = () => {
       return;
     }
 
-    if (!checkoutForm.kunde_name || !checkoutForm.kunde_email || !checkoutForm.abholung_datum) {
+    if (!formData.name || !formData.email) {
       toast({
         title: "Pflichtfelder fehlen",
-        description: "Bitte füllen Sie alle Pflichtfelder aus.",
+        description: "Name und E-Mail sind erforderlich.",
         variant: "destructive",
       });
       return;
     }
 
+    setSubmitting(true);
+
     try {
-      // Bestellung erstellen
-      const { data: bestellung, error: bestellungError } = await supabase
-        .from('shop_bestellungen_2025_10_27_14_00')
-        .insert({
-          kunde_id: null, // Gast-Bestellung
-          kunde_name: checkoutForm.kunde_name,
-          kunde_email: checkoutForm.kunde_email,
-          kunde_telefon: checkoutForm.kunde_telefon,
-          abholung_datum: checkoutForm.abholung_datum,
-          abholung_uhrzeit: checkoutForm.abholung_uhrzeit,
-          abholung_notiz: checkoutForm.abholung_notiz,
-          gesamtpreis: getWarenkorbTotal(),
-          zahlungsart: 'bar',
-          status: 'neu'
-        })
-        .select()
-        .single();
+      const bestellDetails = warenkorb.map(item => 
+        `${item.menge}x ${item.produkt} (${item.preis.toFixed(2)}€/Stück)`
+      ).join('\n');
 
-      if (bestellungError) throw bestellungError;
+      const gesamtpreis = getTotal();
 
-      // Bestellpositionen erstellen
-      const bestellpositionen = warenkorb.map(item => ({
-        bestellung_id: bestellung.id,
-        produkt_id: item.produkt.id,
-        produkt_name: item.produkt.name,
-        menge: item.menge,
-        einzelpreis: item.produkt.preis,
-        gesamtpreis: item.produkt.preis * item.menge
-      }));
+      const { error } = await supabase.functions.invoke('wildfleisch_bestellung_resend_2025_10_25_19_00', {
+        body: {
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          address: formData.address,
+          nachricht: formData.nachricht,
+          bestellung: bestellDetails,
+          gesamtpreis: gesamtpreis.toFixed(2)
+        }
+      });
 
-      const { error: positionenError } = await supabase
-        .from('shop_bestellpositionen_2025_10_27_14_00')
-        .insert(bestellpositionen);
-
-      if (positionenError) throw positionenError;
+      if (error) {
+        throw error;
+      }
 
       toast({
-        title: "Bestellung erfolgreich",
-        description: `Ihre Bestellung ${bestellung.bestellnummer} wurde aufgegeben.`,
+        title: "Bestellung gesendet",
+        description: "Ihre Bestellung wurde erfolgreich übermittelt. Sie erhalten eine Bestätigung per E-Mail.",
       });
 
-      // Warenkorb leeren und Dialog schließen
+      // Formular und Warenkorb zurücksetzen
       setWarenkorb([]);
-      setCheckoutForm({
-        kunde_name: '',
-        kunde_email: '',
-        kunde_telefon: '',
-        abholung_datum: '',
-        abholung_uhrzeit: '10:00',
-        abholung_notiz: ''
+      setFormData({
+        name: user?.user_metadata?.full_name || user?.email?.split('@')[0] || '',
+        email: user?.email || '',
+        phone: '',
+        address: '',
+        nachricht: ''
       });
-      setCheckoutDialog(false);
 
     } catch (error: any) {
-      console.error('Fehler beim Aufgeben der Bestellung:', error);
+      console.error('Fehler beim Senden der Bestellung:', error);
       toast({
-        title: "Fehler bei der Bestellung",
-        description: error.message || "Die Bestellung konnte nicht aufgegeben werden.",
+        title: "Fehler beim Senden",
+        description: error.message || "Die Bestellung konnte nicht gesendet werden.",
         variant: "destructive",
       });
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  // Gefilterte Produkte
-  const filteredProdukte = selectedKategorie === 'alle' 
-    ? produkte 
-    : produkte.filter(p => p.kategorie_id === selectedKategorie);
-
-  if (loading) {
+  if (authLoading || loading) {
     return (
       <section id="wildfleisch-shop" className="py-16 bg-green-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Shop wird geladen...</p>
+            <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4 text-green-600" />
+            <p className="text-gray-600">Lade Wildfleisch-Sortiment...</p>
           </div>
         </div>
       </section>
@@ -320,243 +249,252 @@ export const WildfleischShop = () => {
           <h2 className="text-3xl font-bold text-gray-900 mb-4">Wildfleisch Shop</h2>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
             Frisches Wildfleisch aus nachhaltiger Jagd. Alle Produkte stammen aus unserem Revier 
-            und werden fachgerecht verarbeitet. Barzahlung bei Abholung.
+            und werden fachgerecht verarbeitet.
           </p>
         </div>
 
-        {/* Warenkorb-Anzeige */}
-        {warenkorb.length > 0 && (
-          <div className="mb-8 bg-white rounded-lg shadow-sm p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <ShoppingCart className="h-5 w-5 text-green-600" />
-                <span className="font-medium">
-                  {getWarenkorbCount()} Artikel im Warenkorb
-                </span>
-                <Badge variant="secondary">
-                  {getWarenkorbTotal().toFixed(2)}€
-                </Badge>
+        {/* Anmelde-Hinweis für nicht angemeldete Benutzer */}
+        {!user && (
+          <Alert className="mb-8 border-blue-200 bg-blue-50">
+            <Info className="h-4 w-4 text-blue-600" />
+            <AlertDescription className="text-blue-800">
+              <div className="flex items-center justify-between">
+                <div>
+                  <strong>Hinweis:</strong> Um Wildfleisch zu bestellen, müssen Sie sich anmelden. 
+                  Sie können das Sortiment gerne durchstöbern, aber für Bestellungen ist eine Registrierung erforderlich.
+                </div>
+                <Button variant="outline" size="sm" className="ml-4 border-blue-300 text-blue-700 hover:bg-blue-100">
+                  <LogIn className="h-4 w-4 mr-2" />
+                  Anmelden
+                </Button>
               </div>
-              <Dialog open={checkoutDialog} onOpenChange={setCheckoutDialog}>
-                <DialogTrigger asChild>
-                  <Button>Zur Kasse</Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                  <DialogHeader>
-                    <DialogTitle>Bestellung aufgeben</DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="kunde-name">Name *</Label>
-                        <Input
-                          id="kunde-name"
-                          value={checkoutForm.kunde_name}
-                          onChange={(e) => setCheckoutForm({...checkoutForm, kunde_name: e.target.value})}
-                          placeholder="Ihr vollständiger Name"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="kunde-email">E-Mail *</Label>
-                        <Input
-                          id="kunde-email"
-                          type="email"
-                          value={checkoutForm.kunde_email}
-                          onChange={(e) => setCheckoutForm({...checkoutForm, kunde_email: e.target.value})}
-                          placeholder="ihre@email.de"
-                          required
-                        />
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="kunde-telefon">Telefon</Label>
-                      <Input
-                        id="kunde-telefon"
-                        value={checkoutForm.kunde_telefon}
-                        onChange={(e) => setCheckoutForm({...checkoutForm, kunde_telefon: e.target.value})}
-                        placeholder="Ihre Telefonnummer"
-                      />
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="abholung-datum">Abholung Datum *</Label>
-                        <Input
-                          id="abholung-datum"
-                          type="date"
-                          value={checkoutForm.abholung_datum}
-                          onChange={(e) => setCheckoutForm({...checkoutForm, abholung_datum: e.target.value})}
-                          min={new Date().toISOString().split('T')[0]}
-                          required
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="abholung-uhrzeit">Abholung Uhrzeit</Label>
-                        <Input
-                          id="abholung-uhrzeit"
-                          type="time"
-                          value={checkoutForm.abholung_uhrzeit}
-                          onChange={(e) => setCheckoutForm({...checkoutForm, abholung_uhrzeit: e.target.value})}
-                        />
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="abholung-notiz">Notiz zur Abholung</Label>
-                      <Textarea
-                        id="abholung-notiz"
-                        value={checkoutForm.abholung_notiz}
-                        onChange={(e) => setCheckoutForm({...checkoutForm, abholung_notiz: e.target.value})}
-                        placeholder="Besondere Wünsche oder Hinweise"
-                      />
-                    </div>
-
-                    <div className="bg-gray-50 p-3 rounded">
-                      <h4 className="font-medium mb-2">Bestellübersicht:</h4>
-                      {warenkorb.map((item) => (
-                        <div key={item.produkt.id} className="flex justify-between text-sm">
-                          <span>{item.menge}x {item.produkt.name}</span>
-                          <span>{(item.produkt.preis * item.menge).toFixed(2)}€</span>
-                        </div>
-                      ))}
-                      <div className="border-t mt-2 pt-2 font-bold">
-                        <div className="flex justify-between">
-                          <span>Gesamt:</span>
-                          <span>{getWarenkorbTotal().toFixed(2)}€</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="bg-blue-50 p-3 rounded text-sm">
-                      <p><strong>Zahlungsart:</strong> Barzahlung bei Abholung</p>
-                      <p><strong>Abholung:</strong> Nach Terminvereinbarung</p>
-                    </div>
-
-                    <Button onClick={submitBestellung} className="w-full">
-                      Bestellung verbindlich aufgeben
-                    </Button>
-                  </div>
-                </DialogContent>
-              </Dialog>
-            </div>
-          </div>
+            </AlertDescription>
+          </Alert>
         )}
 
-        {/* Kategorie-Filter */}
-        <div className="mb-8">
-          <div className="flex flex-wrap gap-2 justify-center">
-            <Button
-              variant={selectedKategorie === 'alle' ? 'default' : 'outline'}
-              onClick={() => setSelectedKategorie('alle')}
-            >
-              Alle Produkte
-            </Button>
-            {kategorien.map((kategorie) => (
-              <Button
-                key={kategorie.id}
-                variant={selectedKategorie === kategorie.id ? 'default' : 'outline'}
-                onClick={() => setSelectedKategorie(kategorie.id)}
-              >
-                {kategorie.name}
-              </Button>
-            ))}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Sortiment */}
+          <div className="lg:col-span-2">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ShoppingCart className="h-5 w-5" />
+                  Wildfleisch-Sortiment
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-1/4">Produkt</TableHead>
+                      <TableHead className="w-1/4">Kategorie</TableHead>
+                      <TableHead className="w-1/4">Preis</TableHead>
+                      <TableHead className="w-1/4">Aktion</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {wildfleischSortiment.map((item) => (
+                      <TableRow key={item.id}>
+                        <TableCell className="font-medium">
+                          <div>
+                            {item.produkt_name}
+                            <div className="text-sm text-gray-500">
+                              Lagerbestand: {item.lagerbestand}
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="secondary">{item.kategorie}</Badge>
+                        </TableCell>
+                        <TableCell className="font-semibold">
+                          {item.preis.toFixed(2)}€ / {item.einheit}
+                        </TableCell>
+                        <TableCell>
+                          {user ? (
+                            item.lagerbestand > 0 ? (
+                              <Button
+                                size="sm"
+                                onClick={() => addToWarenkorb(item)}
+                                className="bg-green-600 hover:bg-green-700"
+                              >
+                                <Plus className="h-4 w-4 mr-1" />
+                                Hinzufügen
+                              </Button>
+                            ) : (
+                              <Badge variant="destructive">Ausverkauft</Badge>
+                            )
+                          ) : (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              disabled
+                              className="opacity-50"
+                            >
+                              <Lock className="h-4 w-4 mr-1" />
+                              Anmeldung erforderlich
+                            </Button>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
           </div>
-        </div>
 
-        {/* Produkte */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredProdukte.map((produkt) => {
-            const verfuegbarkeit = getVerfuegbarkeitsStatus(produkt.lagerbestand);
-            const warenkorbItem = warenkorb.find(item => item.produkt.id === produkt.id);
-            
-            return (
-              <Card key={produkt.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                <div className="relative">
-                  <img
-                    src={produkt.hauptbild_url || './images/wildfleisch-placeholder.jpg'}
-                    alt={produkt.name}
-                    className="w-full h-48 object-cover"
-                  />
-                  <div className="absolute top-2 right-2">
-                    <Badge variant={verfuegbarkeit.variant} className="flex items-center gap-1">
-                      <verfuegbarkeit.icon className="h-3 w-3" />
-                      {verfuegbarkeit.status}
-                    </Badge>
-                  </div>
-                </div>
-                
-                <CardHeader>
-                  <CardTitle className="text-lg">{produkt.name}</CardTitle>
-                  <p className="text-sm text-gray-600">{produkt.kurzbeschreibung}</p>
-                </CardHeader>
-                
-                <CardContent>
+          {/* Warenkorb und Bestellung */}
+          <div className="space-y-6">
+            {/* Warenkorb */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <span className="flex items-center gap-2">
+                    <ShoppingCart className="h-5 w-5" />
+                    Warenkorb
+                  </span>
+                  {warenkorb.length > 0 && (
+                    <Badge variant="secondary">{getWarenkorbCount()} Artikel</Badge>
+                  )}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {warenkorb.length === 0 ? (
+                  <p className="text-gray-500 text-center py-4">
+                    {user ? "Warenkorb ist leer" : "Melden Sie sich an, um Artikel hinzuzufügen"}
+                  </p>
+                ) : (
                   <div className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-2xl font-bold text-green-600">
-                        {produkt.preis.toFixed(2)}€
-                      </span>
-                      <span className="text-sm text-gray-500">
-                        pro {produkt.einheit}
-                      </span>
-                    </div>
-                    
-                    <div className="text-sm text-gray-600">
-                      <p><strong>Gewicht:</strong> {produkt.gewicht}g</p>
-                      <p><strong>Herkunft:</strong> {produkt.herkunft}</p>
-                    </div>
-                    
-                    {warenkorbItem ? (
-                      <div className="flex items-center justify-between bg-gray-50 p-2 rounded">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => updateMenge(produkt.id, warenkorbItem.menge - 1)}
-                        >
-                          <Minus className="h-4 w-4" />
-                        </Button>
-                        <span className="mx-3 font-medium">{warenkorbItem.menge}</span>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => updateMenge(produkt.id, warenkorbItem.menge + 1)}
-                        >
-                          <Plus className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => removeFromWarenkorb(produkt.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                    {warenkorb.map((item, index) => (
+                      <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                        <div className="flex-1">
+                          <div className="font-medium">{item.produkt}</div>
+                          <div className="text-sm text-gray-600">
+                            {item.preis.toFixed(2)}€ / Stück
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => updateMenge(item.produkt, item.menge - 1)}
+                          >
+                            <Minus className="h-3 w-3" />
+                          </Button>
+                          <span className="w-8 text-center">{item.menge}</span>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => updateMenge(item.produkt, item.menge + 1)}
+                          >
+                            <Plus className="h-3 w-3" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => removeFromWarenkorb(item.produkt)}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
                       </div>
-                    ) : (
-                      verfuegbarkeit.status !== 'Ausverkauft' && (
-                        <Button
-                          className="w-full"
-                          onClick={() => addToWarenkorb(produkt)}
-                        >
-                          <ShoppingCart className="h-4 w-4 mr-2" />
-                          In den Warenkorb
-                        </Button>
-                      )
-                    )}
+                    ))}
+                    <div className="border-t pt-3">
+                      <div className="flex justify-between items-center font-bold text-lg">
+                        <span>Gesamt:</span>
+                        <span>{getTotal().toFixed(2)}€</span>
+                      </div>
+                    </div>
                   </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Bestellformular */}
+            {user && warenkorb.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Mail className="h-5 w-5" />
+                    Bestellung aufgeben
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <Label htmlFor="name">Name *</Label>
+                    <Input
+                      id="name"
+                      value={formData.name}
+                      onChange={(e) => setFormData({...formData, name: e.target.value})}
+                      placeholder="Ihr vollständiger Name"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="email">E-Mail *</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => setFormData({...formData, email: e.target.value})}
+                      placeholder="ihre@email.de"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="phone">Telefon</Label>
+                    <Input
+                      id="phone"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                      placeholder="Ihre Telefonnummer"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="address">Adresse</Label>
+                    <Textarea
+                      id="address"
+                      value={formData.address}
+                      onChange={(e) => setFormData({...formData, address: e.target.value})}
+                      placeholder="Ihre Adresse für die Lieferung"
+                      rows={2}
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="nachricht">Nachricht</Label>
+                    <Textarea
+                      id="nachricht"
+                      value={formData.nachricht}
+                      onChange={(e) => setFormData({...formData, nachricht: e.target.value})}
+                      placeholder="Besondere Wünsche oder Anmerkungen"
+                      rows={3}
+                    />
+                  </div>
+                  
+                  <Button 
+                    onClick={submitBestellung} 
+                    disabled={submitting}
+                    className="w-full bg-green-600 hover:bg-green-700"
+                  >
+                    {submitting ? (
+                      <>
+                        <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                        Wird gesendet...
+                      </>
+                    ) : (
+                      <>
+                        <Mail className="h-4 w-4 mr-2" />
+                        Bestellung senden
+                      </>
+                    )}
+                  </Button>
                 </CardContent>
               </Card>
-            );
-          })}
-        </div>
-
-        {filteredProdukte.length === 0 && (
-          <div className="text-center py-12">
-            <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600">Keine Produkte in dieser Kategorie verfügbar.</p>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </section>
   );
