@@ -17,9 +17,7 @@ import { ShopVerwaltung } from '@/components/ShopVerwaltung';
 import { ShopBestellVerwaltung } from '@/components/ShopBestellVerwaltung';
 import { BenutzerVerwaltung } from '@/components/BenutzerVerwaltung';
 import { ErweiterteBenutzerverwaltung } from '@/components/ErweiterteBenutzerverwaltung';
-import { AdminStatusDebug } from '@/components/AdminStatusDebug';
-import { BestellungenDebug } from '@/components/BestellungenDebug';
-import { LagerbestandDebug } from '@/components/LagerbestandDebug';
+
 import { BlogVerwaltungSimple } from '@/components/BlogVerwaltungSimple';
 import { KontaktVerwaltung } from '@/components/KontaktVerwaltung';
 import { VeranstaltungsVerwaltung } from '@/components/VeranstaltungsVerwaltung';
@@ -46,11 +44,7 @@ const IndexContent = () => {
       <WildfleischShop />
       <Contact />
       
-      {/* Debug-Komponenten */}
-      <AdminStatusDebug />
-      <BestellungenDebug />
-      <LagerbestandDebug />
-      
+
       {/* Admin-Bereiche - NUR für angemeldete Administratoren */}
       {showAdminAreas && (
         <>
