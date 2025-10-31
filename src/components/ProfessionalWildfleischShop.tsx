@@ -307,7 +307,7 @@ export const ProfessionalWildfleischShop: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-8">
+    <div id="wildfleisch-shop" className="container mx-auto p-6 space-y-8">
       <div className="text-center space-y-4">
         <h1 className="text-4xl font-bold text-primary">Wildfleisch-Sortiment</h1>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
