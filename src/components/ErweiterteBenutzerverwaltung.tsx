@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthProvider';
 import { useAdminStatus } from '@/hooks/useAdminStatus';
 import { 
   Users, 
@@ -47,6 +48,7 @@ interface User {
 
 export const ErweiterteBenutzerverwaltung: React.FC = () => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const { isAdmin, isSuperAdmin, loading: adminLoading } = useAdminStatus();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -103,14 +105,51 @@ export const ErweiterteBenutzerverwaltung: React.FC = () => {
 
   const updateUserRole = async (userId: string, newRole: string) => {
     try {
-      // Verwende die korrigierte Funktion die Key Constraint Violations vermeidet
-      const { error } = await supabase.rpc('set_simple_user_role', {
-        target_user_id: userId,
-        new_role: newRole
-      });
-
-      if (error) throw error;
-
+      console.log('Updating role for user:', userId, 'to:', newRole);
+      
+      // Direkte Datenbank-Operationen ohne RPC
+      // 1. Lösche alle alten Rollen
+      const { error: deleteError } = await supabase
+        .from('simple_user_roles_2025_10_31_12_00')
+        .delete()
+        .eq('user_id', userId);
+      
+      if (deleteError) {
+        console.error('Fehler beim Löschen alter Rollen:', deleteError);
+        throw deleteError;
+      }
+      
+      // 2. Füge neue Rolle hinzu
+      const { error: insertError } = await supabase
+        .from('simple_user_roles_2025_10_31_12_00')
+        .insert({
+          user_id: userId,
+          role: newRole,
+          created_by: user?.id || null
+        });
+      
+      if (insertError) {
+        console.error('Fehler beim Hinzufügen neuer Rolle:', insertError);
+        throw insertError;
+      }
+      
+      // 3. Aktualisiere Benutzer-Typ im Profil
+      const benutzerTyp = (newRole === 'super_admin' || newRole === 'admin') ? 'admin' : 'shop_user';
+      const { error: updateError } = await supabase
+        .from('benutzer_profile_2025_10_31_11_00')
+        .update({
+          benutzer_typ: benutzerTyp,
+          aktualisiert_am: new Date().toISOString()
+        })
+        .eq('user_id', userId);
+      
+      if (updateError) {
+        console.error('Fehler beim Aktualisieren des Profils:', updateError);
+        // Nicht kritisch, weitermachen
+      }
+      
+      console.log('Rolle erfolgreich aktualisiert');
+      
       toast({
         title: "Rolle aktualisiert",
         description: `Benutzer wurde als ${getRoleLabel(newRole)} eingestuft.`,
@@ -120,8 +159,8 @@ export const ErweiterteBenutzerverwaltung: React.FC = () => {
     } catch (error: any) {
       console.error('Fehler beim Aktualisieren der Rolle:', error);
       toast({
-        title: "Fehler",
-        description: error.message,
+        title: "Fehler beim Rollenwechsel",
+        description: `Fehler: ${error.message}. Bitte versuchen Sie es erneut.`,
         variant: "destructive",
       });
     }
