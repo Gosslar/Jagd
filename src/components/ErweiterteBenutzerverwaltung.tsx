@@ -33,6 +33,7 @@ import {
 
 interface User {
   id: string;
+  user_id: string;
   email: string;
   full_name?: string;
   telefon?: string;
@@ -78,6 +79,7 @@ export const ErweiterteBenutzerverwaltung: React.FC = () => {
       // Einfachste Lösung: Rolle ist bereits im Profil
       const usersWithRoles = (profiles || []).map(profile => ({
         ...profile,
+        id: profile.user_id, // Für Kompatibilität
         roles: profile.rolle ? [profile.rolle] : []
       }));
 
@@ -101,6 +103,19 @@ export const ErweiterteBenutzerverwaltung: React.FC = () => {
       // Validierung
       if (!userId || userId.trim() === '') {
         throw new Error('Ungültige Benutzer-ID');
+      }
+      
+      // Debug: Prüfe ob Benutzer in der Datenbank existiert
+      const { data: existingUser, error: checkError } = await supabase
+        .from('benutzer_profile_2025_10_31_11_00')
+        .select('user_id, email, full_name, rolle')
+        .eq('user_id', userId)
+        .single();
+      
+      console.log('Existing user check:', { existingUser, checkError });
+      
+      if (checkError || !existingUser) {
+        throw new Error(`Benutzer mit ID ${userId} nicht in der Datenbank gefunden`);
       }
       
       if (!['super_admin', 'admin', 'shop_user'].includes(newRole)) {
@@ -472,7 +487,7 @@ export const ErweiterteBenutzerverwaltung: React.FC = () => {
                             <Button
                               size="sm"
                               variant="outline"
-                              onClick={() => approveUser(user.id)}
+                              onClick={() => approveUser(user.user_id)}
                               className="text-green-600 hover:text-green-700"
                             >
                               <CheckCircle className="h-3 w-3" />
@@ -554,7 +569,7 @@ export const ErweiterteBenutzerverwaltung: React.FC = () => {
                                     
                                     <div className="flex flex-wrap gap-2">
                                       {/* Rolle ändern */}
-                                      <Select onValueChange={(value) => updateUserRole(selectedUser.id, value)}>
+                                      <Select onValueChange={(value) => updateUserRole(selectedUser.user_id, value)}>
                                         <SelectTrigger className="w-48">
                                           <SelectValue placeholder="Rolle zuweisen" />
                                         </SelectTrigger>
@@ -568,7 +583,7 @@ export const ErweiterteBenutzerverwaltung: React.FC = () => {
                                       </Select>
                                       
                                       {/* Status ändern */}
-                                      <Select onValueChange={(value) => updateUserStatus(selectedUser.id, value)}>
+                                      <Select onValueChange={(value) => updateUserStatus(selectedUser.user_id, value)}>
                                         <SelectTrigger className="w-48">
                                           <SelectValue placeholder="Status ändern" />
                                         </SelectTrigger>
@@ -640,7 +655,7 @@ export const ErweiterteBenutzerverwaltung: React.FC = () => {
               </Button>
               <Button 
                 variant="destructive" 
-                onClick={() => selectedUser && deleteUser(selectedUser.id)}
+                onClick={() => selectedUser && deleteUser(selectedUser.user_id)}
               >
                 <Trash2 className="h-4 w-4 mr-1" />
                 Endgültig löschen
