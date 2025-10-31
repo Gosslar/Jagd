@@ -10,17 +10,13 @@
     <meta property="og:title" content="Jagd Weetzen - Nachhaltige Jagd in Niedersachsen" />
     <meta property="og:description" content="Jagd Weetzen bietet nachhaltige Jagd auf 340 Hektar Wald- und Feldlandschaft in Niedersachsen. Erfahren Sie mehr über Wildarten, Jagdzeiten und Wildfleischverkauf." />
     <meta property="og:type" content="website" />
-    
-    <style>
-      /* Basis-Styles für Lade-Indikator */
-      body {
-        margin: 0;
-        padding: 0;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background-color: #f8f9fa;
-      }
-      
-      #loading-indicator {
+    <script type="module" crossorigin src="/assets/index-CRZ42O-p.js"></script>
+  </head>
+
+  <body>
+    <div id="root">
+      <!-- Einfacher Lade-Indikator -->
+      <div style="
         position: fixed;
         top: 0;
         left: 0;
@@ -31,205 +27,45 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        z-index: 9999;
-      }
+        font-family: Arial, sans-serif;
+      ">
+        <div style="
+          width: 50px;
+          height: 50px;
+          border: 4px solid #e3e3e3;
+          border-top: 4px solid #4a7c59;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+          margin-bottom: 20px;
+        "></div>
+        <h2 style="color: #2c5530; margin-bottom: 10px;">🦌 Jagdrevier Weetzen</h2>
+        <p style="color: #666;">Lade Website...</p>
+        <p style="color: #999; font-size: 0.9em; margin-top: 20px;">
+          <a href="/fallback.html" style="color: #4a7c59;">Fallback-Version</a> | 
+          <a href="/diagnose.html" style="color: #4a7c59;">Diagnose</a>
+        </p>
+      </div>
       
-      .spinner {
-        width: 60px;
-        height: 60px;
-        border: 4px solid #e3e3e3;
-        border-top: 4px solid #4a7c59;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        margin-bottom: 20px;
-      }
-      
-      @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-      }
-      
-      .loading-text {
-        color: #2c5530;
-        margin-bottom: 10px;
-        font-size: 1.5rem;
-        font-weight: bold;
-      }
-      
-      .loading-subtitle {
-        color: #666;
-        text-align: center;
-        margin-bottom: 20px;
-      }
-      
-      .loading-links {
-        color: #999;
-        font-size: 0.9em;
-        text-align: center;
-      }
-      
-      .loading-links a {
-        color: #4a7c59;
-        text-decoration: none;
-      }
-      
-      .loading-links a:hover {
-        text-decoration: underline;
-      }
-      
-      /* Verstecke Root-Element bis React lädt */
-      #root:empty {
-        display: none;
-      }
-      
-      #root:not(:empty) {
-        display: block;
-      }
-    </style>
-    <script type="module" crossorigin src="/assets/index-ANtmZGeJ.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-CQZbmO-F.css">
-  </head>
-
-  <body>
-    <!-- Lade-Indikator -->
-    <div id="loading-indicator">
-      <div class="spinner"></div>
-      <h2 class="loading-text">🦌 Jagdrevier Weetzen</h2>
-      <p class="loading-subtitle">Lade Website...</p>
-      <p class="loading-links">
-        Falls die Seite nicht lädt: 
-        <a href="/diagnose.html">Diagnose ausführen</a> | 
-        <a href="/fallback.html">Fallback-Version</a>
-      </p>
+      <style>
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      </style>
     </div>
-    
-    <!-- React-Container -->
-    <div id="root"></div>
     
     <script>
       console.log('🦌 Jagdrevier Weetzen - HTML geladen');
       
-      // Globale Variablen
-      let loadingRemoved = false;
-      let fallbackTimer;
-      
-      // Entferne Lade-Indikator
-      function removeLoadingIndicator() {
-        if (!loadingRemoved) {
-          const indicator = document.getElementById('loading-indicator');
-          if (indicator) {
-            indicator.style.display = 'none';
-            loadingRemoved = true;
-            console.log('✅ Lade-Indikator entfernt');
-          }
-          
-          if (fallbackTimer) {
-            clearTimeout(fallbackTimer);
-          }
+      // Einfacher Fallback-Timer
+      setTimeout(function() {
+        const root = document.getElementById('root');
+        if (root && root.children.length === 1) {
+          console.warn('⚠️ React-App nicht geladen nach 10 Sekunden');
+          window.location.href='/fallback.html';
         }
-      }
-      
-      // Prüfe ob React-App geladen ist
-      function checkReactApp() {
-        const rootElement = document.getElementById('root');
-        if (rootElement && rootElement.children.length > 0) {
-          console.log('✅ React-App erkannt');
-          removeLoadingIndicator();
-          return true;
-        }
-        return false;
-      }
-      
-      // Überwache React-Container
-      function observeReactContainer() {
-        const rootElement = document.getElementById('root');
-        if (!rootElement) {
-          console.error('❌ Root-Element nicht gefunden!');
-          return;
-        }
-        
-        console.log('👀 Überwache React-Container...');
-        
-        const observer = new MutationObserver(function(mutations) {
-          mutations.forEach(function(mutation) {
-            if (mutation.type === 'childList' && mutation.target.id === 'root') {
-              if (mutation.target.children.length > 0) {
-                console.log('✅ React-Content erkannt');
-                removeLoadingIndicator();
-                observer.disconnect();
-              }
-            }
-          });
-        });
-        
-        observer.observe(rootElement, { 
-          childList: true, 
-          subtree: true 
-        });
-      }
-      
-      // Fallback-Timer
-      function startFallbackTimer() {
-        fallbackTimer = setTimeout(function() {
-          if (!loadingRemoved) {
-            console.warn('⚠️ React-App konnte nicht geladen werden nach 15 Sekunden');
-            console.log('🔄 Weiterleitung zur Fallback-Seite...');
-            window.location.href='/fallback.html';
-          }
-        }, 15000); // 15 Sekunden warten
-      }
-      
-      // Initialisierung
-      function initialize() {
-        console.log('🚀 Initialisiere Jagdrevier Website...');
-        
-        // Prüfe sofort ob React bereits geladen ist
-        if (checkReactApp()) {
-          return;
-        }
-        
-        // Starte Überwachung
-        observeReactContainer();
-        
-        // Starte Fallback-Timer
-        startFallbackTimer();
-        
-        // Prüfe periodisch
-        const checkInterval = setInterval(function() {
-          if (checkReactApp()) {
-            clearInterval(checkInterval);
-          }
-        }, 1000);
-      }
-      
-      // Fehler-Behandlung
-      window.addEventListener('error', function(e) {
-        console.error('❌ JavaScript-Fehler:', e.error);
-        console.error('📍 Datei:', e.filename, 'Zeile:', e.lineno);
-      });
-      
-      window.addEventListener('unhandledrejection', function(e) {
-        console.error('❌ Unbehandelte Promise-Ablehnung:', e.reason);
-      });
-      
-      // Starte wenn DOM bereit ist
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initialize);
-      } else {
-        initialize();
-      }
-      
-      // Backup: Starte auch nach window.load
-      window.addEventListener('load', function() {
-        setTimeout(function() {
-          if (!loadingRemoved) {
-            console.log('🔄 Backup-Initialisierung...');
-            initialize();
-          }
-        }, 1000);
-      });
+      }, 10000);
     </script>
     
-    <!-- React-App laden -->
   </body>
 </html>
