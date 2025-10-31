@@ -6,6 +6,7 @@ import { RevierInfo } from '@/components/RevierInfo';
 import { JagdrevierInfobox } from '@/components/JagdrevierInfobox';
 import { Wildarten } from '@/components/Wildarten';
 import { Praedatorenmanagement } from '@/components/Praedatorenmanagement';
+import { Jagdhunde } from '@/components/Jagdhunde';
 import { Rehkitzrettung } from '@/components/Rehkitzrettung';
 import { WildfleischShop } from '@/components/WildfleischShop';
 import { Contact } from '@/components/Contact';
@@ -36,6 +37,7 @@ const IndexContent = () => {
       <News />
       <Wildarten />
       <Praedatorenmanagement />
+      <Jagdhunde />
       <Rehkitzrettung />
       <WildfleischShop />
       <Contact />

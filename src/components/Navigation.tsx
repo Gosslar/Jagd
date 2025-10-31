@@ -30,6 +30,7 @@ export const Navigation: React.FC = () => {
     { id: 'revier', label: 'Revier' },
     { id: 'wildarten', label: 'Wildarten' },
     { id: 'praedatorenmanagement', label: 'Prädatoren' },
+    { id: 'jagdhunde', label: 'Jagdhunde' },
     { id: 'rehkitzrettung', label: 'Rehkitzrettung' },
     { id: 'wildfleisch-shop', label: 'Wildfleisch Shop', special: true },
     { id: 'news', label: 'Aktuelles' },
