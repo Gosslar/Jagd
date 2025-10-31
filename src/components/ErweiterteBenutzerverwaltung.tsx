@@ -104,7 +104,8 @@ export const ErweiterteBenutzerverwaltung: React.FC = () => {
 
   const updateUserRole = async (userId: string, newRole: string) => {
     try {
-      const { error } = await supabase.rpc('set_user_role', {
+      // Verwende die korrigierte Funktion die Key Constraint Violations vermeidet
+      const { error } = await supabase.rpc('set_user_role_fixed', {
         target_user_id: userId,
         new_role: newRole
       });
