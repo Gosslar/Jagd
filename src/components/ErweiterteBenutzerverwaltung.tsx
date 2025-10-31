@@ -98,29 +98,42 @@ export const ErweiterteBenutzerverwaltung: React.FC = () => {
     try {
       console.log('Updating role for user:', userId, 'to:', newRole);
       
+      // Validierung
+      if (!userId || userId.trim() === '') {
+        throw new Error('Ungültige Benutzer-ID');
+      }
+      
+      if (!['super_admin', 'admin', 'shop_user'].includes(newRole)) {
+        throw new Error('Ungültige Rolle: ' + newRole);
+      }
+      
       // Einfachste Lösung: Rolle direkt im Profil aktualisieren
       const benutzerTyp = (newRole === 'super_admin' || newRole === 'admin') ? 'admin' : 'shop_user';
       
-      const { error } = await supabase
+      console.log('Executing update with:', { userId, newRole, benutzerTyp });
+      
+      const { data, error } = await supabase
         .from('benutzer_profile_2025_10_31_11_00')
         .update({
           rolle: newRole,
           benutzer_typ: benutzerTyp,
           aktualisiert_am: new Date().toISOString()
         })
-        .eq('user_id', userId);
+        .eq('user_id', userId)
+        .select();
+      
+      console.log('Update result:', { data, error });
       
       if (error) {
-        console.error('Fehler beim Aktualisieren der Rolle:', error);
-        throw error;
+        console.error('Supabase Fehler:', error);
+        throw new Error(`Datenbank-Fehler: ${error.message}`);
       }
       
-      if (updateError) {
-        console.error('Fehler beim Aktualisieren des Profils:', updateError);
-        // Nicht kritisch, weitermachen
+      if (!data || data.length === 0) {
+        throw new Error('Benutzer nicht gefunden oder keine Änderungen vorgenommen');
       }
       
-      console.log('Rolle erfolgreich aktualisiert');
+      console.log('Rolle erfolgreich aktualisiert:', data[0]);
       
       toast({
         title: "Rolle aktualisiert",
@@ -132,7 +145,7 @@ export const ErweiterteBenutzerverwaltung: React.FC = () => {
       console.error('Fehler beim Aktualisieren der Rolle:', error);
       toast({
         title: "Fehler beim Rollenwechsel",
-        description: `Fehler: ${error.message}. Bitte versuchen Sie es erneut.`,
+        description: `Fehler: ${error.message || 'Unbekannter Fehler'}`,
         variant: "destructive",
       });
     }
