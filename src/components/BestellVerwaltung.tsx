@@ -17,9 +17,11 @@ interface Bestellung {
   email: string;
   telefon: string;
   adresse: string;
+  nachricht?: string;
   bestellung_json: any[];
   gesamtpreis: number;
   bestellstatus: string;
+  status?: string;
   lager_reduziert: boolean;
   bearbeitet_von?: string;
   bearbeitet_am?: string;
@@ -29,11 +31,13 @@ interface Bestellung {
 
 interface BestellPosition {
   id: string;
+  bestellung_id: string;
   produkt_name: string;
   menge: number;
   einzelpreis: number;
   gesamtpreis: number;
-  lager_reduziert: boolean;
+  lager_reduziert?: boolean;
+  erstellt_am?: string;
 }
 
 export const BestellVerwaltung: React.FC = () => {
@@ -51,25 +55,44 @@ export const BestellVerwaltung: React.FC = () => {
 
   const loadBestellungen = async () => {
     try {
+      console.log('Loading orders from new simple tables...');
+      
+      // Lade Bestellungen aus neuer einfacher Tabelle
       const { data, error } = await supabase
-        .from('wildfleisch_bestellungen_2025_10_24_08_03')
+        .from('simple_bestellungen_2025_10_31_12_00')
         .select('*')
         .order('erstellt_am', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error loading orders:', error);
+        throw error;
+      }
       
-      // Debug: Zeige die ersten Bestellungen in der Konsole
-      console.log('Geladene Bestellungen:', data?.slice(0, 2));
+      console.log('Loaded orders:', data?.length || 0, 'orders');
+      console.log('First order:', data?.[0]);
       
-      setBestellungen(data || []);
+      // Konvertiere zu altem Format für Kompatibilität
+      const convertedOrders = (data || []).map(order => ({
+        ...order,
+        bestellstatus: order.status || 'neu',
+        bestellung_json: [], // Wird aus Positionen geladen
+        lager_reduziert: false
+      }));
+      
+      setBestellungen(convertedOrders);
 
-      // Lade Positionen für alle Bestellungen
+      // Lade Positionen aus neuer einfacher Tabelle
       const { data: positionenData, error: positionenError } = await supabase
-        .from('bestellpositionen_2025_10_25_20_00')
+        .from('simple_bestellpositionen_2025_10_31_12_00')
         .select('*')
         .order('erstellt_am', { ascending: true });
 
-      if (positionenError) throw positionenError;
+      if (positionenError) {
+        console.error('Error loading positions:', positionenError);
+        throw positionenError;
+      }
+      
+      console.log('Loaded positions:', positionenData?.length || 0, 'positions');
 
       // Gruppiere Positionen nach Bestellung
       const positionenMap: { [key: string]: BestellPosition[] } = {};
@@ -138,12 +161,9 @@ export const BestellVerwaltung: React.FC = () => {
         
         // Methode 2: Direktes Update als Fallback
         const { error: updateError } = await supabase
-          .from('wildfleisch_bestellungen_2025_10_24_08_03')
+          .from('simple_bestellungen_2025_10_31_12_00')
           .update({
-            bestellstatus: 'freigegeben',
-            bearbeitet_von: user.id,
-            bearbeitet_am: new Date().toISOString(),
-            admin_notiz: adminNotiz || null
+            status: 'freigegeben'
           })
           .eq('id', bestellungId);
 
@@ -182,12 +202,9 @@ export const BestellVerwaltung: React.FC = () => {
     setActionLoading(bestellungId);
     try {
       const { error } = await supabase
-        .from('wildfleisch_bestellungen_2025_10_24_08_03')
+        .from('simple_bestellungen_2025_10_31_12_00')
         .update({
-          bestellstatus: 'abgelehnt',
-          bearbeitet_von: user.id,
-          bearbeitet_am: new Date().toISOString(),
-          admin_notiz: adminNotiz || null
+          status: 'abgelehnt'
         })
         .eq('id', bestellungId);
 
