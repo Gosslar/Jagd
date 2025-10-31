@@ -73,11 +73,10 @@ export const ErweiterteBenutzerverwaltung: React.FC = () => {
 
       if (profilesError) throw profilesError;
 
-      // Lade Rollen für alle Benutzer
+      // Lade Rollen für alle Benutzer aus einfacher Tabelle
       const { data: roles, error: rolesError } = await supabase
-        .from('benutzer_rollen_2025_10_31_11_00')
-        .select('user_id, rolle')
-        .eq('aktiv', true);
+        .from('simple_user_roles_2025_10_31_12_00')
+        .select('user_id, role');
 
       if (rolesError) throw rolesError;
 
@@ -86,7 +85,7 @@ export const ErweiterteBenutzerverwaltung: React.FC = () => {
         ...profile,
         roles: (roles || [])
           .filter(role => role.user_id === profile.user_id)
-          .map(role => role.rolle)
+          .map(role => role.role)
       }));
 
       setUsers(usersWithRoles);
@@ -105,7 +104,7 @@ export const ErweiterteBenutzerverwaltung: React.FC = () => {
   const updateUserRole = async (userId: string, newRole: string) => {
     try {
       // Verwende die korrigierte Funktion die Key Constraint Violations vermeidet
-      const { error } = await supabase.rpc('set_user_role_fixed', {
+      const { error } = await supabase.rpc('set_simple_user_role', {
         target_user_id: userId,
         new_role: newRole
       });
