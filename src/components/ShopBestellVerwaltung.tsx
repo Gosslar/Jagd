@@ -126,6 +126,7 @@ export const ShopBestellVerwaltung: React.FC = () => {
           gesamtpreis: position.gesamtpreis
         });
       });
+      console.log('Final positions map:', positionenMap);
       setPositionen(positionenMap);
 
     } catch (error: any) {
