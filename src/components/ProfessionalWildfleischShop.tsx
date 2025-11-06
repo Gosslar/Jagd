@@ -341,8 +341,9 @@ export const ProfessionalWildfleischShop: React.FC = () => {
         gesamtpreis: item.preis * item.menge
       }));
 
+      console.log('🛒 PROFESSIONAL SHOP: Speichere Warenkorb-Artikel:', bestellpositionen);
       const { error: positionenError } = await supabase
-        .from('simple_bestellpositionen_2025_10_31_12_00')
+        .from('simple_bestellpositionen_2025_11_06_21_00')
         .insert(bestellpositionen);
 
       if (positionenError) throw positionenError;
