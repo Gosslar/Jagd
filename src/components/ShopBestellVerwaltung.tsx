@@ -106,8 +106,19 @@ export const ShopBestellVerwaltung: React.FC = () => {
         .from('simple_bestellpositionen_2025_11_06_21_00')
         .select('*');
       
-      console.log('Positions data:', positionenData);
-      console.log('Positions error:', positionenError);
+      console.log('🛒 POSITIONS LOADED:', positionenData?.length || 0, 'positions');
+      console.log('🛒 POSITIONS DATA:', positionenData);
+      console.log('🛒 POSITIONS ERROR:', positionenError);
+      
+      // Zeige jede Position einzeln
+      positionenData?.forEach((pos, index) => {
+        console.log(`🥩 POSITION ${index + 1}:`, {
+          id: pos.id,
+          bestellung_id: pos.bestellung_id,
+          produkt_name: pos.produkt_name,
+          menge: pos.menge
+        });
+      });
 
       if (positionenError) throw positionenError;
 
