@@ -241,7 +241,7 @@ export const WildfleischShop: React.FC = () => {
         console.error('Fehler beim Erstellen der Bestellpositionen:', positionenError);
         // Bestellung löschen falls Positionen fehlschlagen
         await supabase
-          .from('simple_bestellungen_2025_10_31_12_00')
+          .from('simple_bestellungen_2025_11_06_21_00')
           .delete()
           .eq('id', bestellungData.id);
         throw new Error(`Bestellpositionen konnten nicht erstellt werden: ${positionenError.message}`);
