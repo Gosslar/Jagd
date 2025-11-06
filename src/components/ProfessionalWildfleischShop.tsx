@@ -322,10 +322,10 @@ export const ProfessionalWildfleischShop: React.FC = () => {
           telefon: formData.phone,
           adresse: formData.address,
           nachricht: formData.nachricht,
-          gesamtpreis: getGesamtpreis(),
+          gesamtpreis: gesamtpreis,
           status: 'neu',
-          zahlungsstatus: 'offen',
-          zahlungsart: 'bar'
+          created_at: currentTime,
+          updated_at: currentTime
         })
         .select()
         .single();
