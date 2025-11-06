@@ -220,13 +220,16 @@ export const ShopBestellVerwaltung: React.FC = () => {
       doc.text('Bestellte Artikel:', 20, 150);
       let yPos = 160;
       
-      bestellPositionen.forEach((position, index) => {
-        doc.text(`${index + 1}. ${position.produkt_name}`, 20, yPos);
-        doc.text(`   Menge: ${position.menge}`, 20, yPos + 10);
-        doc.text(`   Einzelpreis: ${position.einzelpreis.toFixed(2)}€`, 20, yPos + 20);
-        doc.text(`   Gesamtpreis: ${position.gesamtpreis.toFixed(2)}€`, 20, yPos + 30);
-        yPos += 50;
-      });
+      if (bestellPositionen.length > 0) {
+        bestellPositionen.forEach((position, index) => {
+          doc.text(`${index + 1}. ${position.produkt_name}`, 20, yPos);
+          doc.text(`   Menge: ${position.menge}`, 20, yPos + 10);
+          yPos += 30;
+        });
+      } else {
+        doc.text('Details nicht verfügbar (migrierte Bestellung)', 20, yPos);
+        yPos += 20;
+      }
       
       // Gesamtpreis
       doc.setFontSize(14);
@@ -430,14 +433,20 @@ export const ShopBestellVerwaltung: React.FC = () => {
                               </TableRow>
                             </TableHeader>
                             <TableBody>
-                              {(positionen[selectedBestellung.id] || []).map((position) => (
-                                <TableRow key={position.id}>
-                                  <TableCell>{position.produkt_name}</TableCell>
-                                  <TableCell>{position.menge}</TableCell>
-                                  <TableCell>{position.einzelpreis.toFixed(2)}€</TableCell>
-                                  <TableCell>{position.gesamtpreis.toFixed(2)}€</TableCell>
+                              {(positionen[selectedBestellung.id] || []).length > 0 ? (
+                                positionen[selectedBestellung.id].map((position) => (
+                                  <TableRow key={position.id}>
+                                    <TableCell>{position.produkt_name}</TableCell>
+                                    <TableCell>{position.menge}</TableCell>
+                                  </TableRow>
+                                ))
+                              ) : (
+                                <TableRow>
+                                  <TableCell colSpan={2} className="text-center text-gray-500">
+                                    Keine Artikeldetails verfügbar (migrierte Bestellung)
+                                  </TableCell>
                                 </TableRow>
-                              ))}
+                              )}
                             </TableBody>
                           </Table>
                         </div>
