@@ -26,7 +26,9 @@ import {
   XCircle,
   Filter,
   RefreshCw,
-  ShoppingCart
+  ShoppingCart,
+  Trash2,
+  AlertCircle
 } from 'lucide-react';
 
 interface ShopBestellung {
