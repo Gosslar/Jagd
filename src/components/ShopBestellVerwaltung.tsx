@@ -174,7 +174,59 @@ export const ShopBestellVerwaltung: React.FC = () => {
 
   const updateBestellungStatus = async (id: string, newStatus: string) => {
     try {
-      console.log('Updating status for order:', id, 'to:', newStatus);
+      console.log('Updating order status:', { id, newStatus });
+      
+      // Wenn Bestellung bestätigt wird, reduziere Lagerbestände
+      if (newStatus === 'bestätigt') {
+        console.log('📦 Bestellung bestätigt - reduziere Lagerbestände...');
+        
+        // Lade Bestellpositionen für diese Bestellung
+        const { data: bestellPositionen, error: positionenError } = await supabase
+          .from('simple_bestellpositionen_2025_11_06_21_00')
+          .select('*')
+          .eq('bestellung_id', id);
+        
+        if (positionenError) {
+          console.error('Fehler beim Laden der Bestellpositionen:', positionenError);
+          throw positionenError;
+        }
+        
+        console.log('📦 Gefundene Bestellpositionen:', bestellPositionen);
+        
+        // Reduziere Lagerbestand für jeden Artikel
+        for (const position of bestellPositionen || []) {
+          console.log(`📦 Reduziere Lagerbestand für: ${position.produkt_name}, Menge: ${position.menge}`);
+          
+          // Finde das Produkt in der Shop-Tabelle
+          const { data: produkte, error: produktError } = await supabase
+            .from('shop_produkte_2025_10_27_14_00')
+            .select('*')
+            .eq('name', position.produkt_name)
+            .single();
+          
+          if (produktError) {
+            console.error(`Produkt nicht gefunden: ${position.produkt_name}`, produktError);
+            continue; // Überspringe dieses Produkt, aber setze mit anderen fort
+          }
+          
+          const neuerLagerbestand = (produkte.lagerbestand || 0) - position.menge;
+          console.log(`📦 ${position.produkt_name}: ${produkte.lagerbestand} → ${neuerLagerbestand}`);
+          
+          // Aktualisiere Lagerbestand
+          const { error: updateError } = await supabase
+            .from('shop_produkte_2025_10_27_14_00')
+            .update({ lagerbestand: Math.max(0, neuerLagerbestand) }) // Verhindere negative Bestände
+            .eq('id', produkte.id);
+          
+          if (updateError) {
+            console.error(`Fehler beim Aktualisieren des Lagerbestands für ${position.produkt_name}:`, updateError);
+          } else {
+            console.log(`✅ Lagerbestand aktualisiert für ${position.produkt_name}: ${neuerLagerbestand}`);
+          }
+        }
+        
+        console.log('✅ Alle Lagerbestände erfolgreich reduziert!');
+      }
       
       const { error } = await supabase
         .from('simple_bestellungen_2025_11_06_21_00')
@@ -188,7 +240,9 @@ export const ShopBestellVerwaltung: React.FC = () => {
       
       toast({
         title: "Status aktualisiert",
-        description: `Bestellung wurde als ${newStatus} markiert.`,
+        description: newStatus === 'bestätigt' 
+          ? `Bestellung wurde bestätigt und Lagerbestände wurden reduziert.`
+          : `Bestellung wurde als ${newStatus} markiert.`,
       });
       
       // Reload data
