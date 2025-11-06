@@ -101,7 +101,7 @@ export const ShopBestellVerwaltung: React.FC = () => {
 
       // Lade Bestellpositionen
       const { data: positionenData, error: positionenError } = await supabase
-        .from('simple_bestellpositionen_2025_10_31_12_00')
+        .from('simple_bestellpositionen_2025_11_06_21_00')
         .select('*');
 
       if (positionenError) throw positionenError;
@@ -140,7 +140,7 @@ export const ShopBestellVerwaltung: React.FC = () => {
       console.log('Updating status for order:', id, 'to:', newStatus);
       
       const { error } = await supabase
-        .from('simple_bestellungen_2025_10_31_12_00')
+        .from('simple_bestellungen_2025_11_06_21_00')
         .update({ status: newStatus })
         .eq('id', id);
       
@@ -169,7 +169,7 @@ export const ShopBestellVerwaltung: React.FC = () => {
   const updateNotizen = async (bestellungId: string) => {
     try {
       const { error } = await supabase
-        .from('simple_bestellungen_2025_10_31_12_00')
+        .from('simple_bestellungen_2025_11_06_21_00')
         .update({ nachricht: notizen })
         .eq('id', bestellungId);
 
