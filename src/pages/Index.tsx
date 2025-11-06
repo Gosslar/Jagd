@@ -14,7 +14,7 @@ import { Footer } from '@/components/Footer';
 import { News } from '@/components/News';
 import { AuthProvider, useAuth } from '@/contexts/AuthProvider';
 import { ShopVerwaltung } from '@/components/ShopVerwaltung';
-import { BestellVerwaltung } from '@/components/BestellVerwaltungNeu';
+import { BestellVerwaltung } from '@/components/BestellVerwaltung';
 import { BenutzerVerwaltung } from '@/components/BenutzerVerwaltung';
 import { ErweiterteBenutzerverwaltung } from '@/components/ErweiterteBenutzerverwaltung';
 
