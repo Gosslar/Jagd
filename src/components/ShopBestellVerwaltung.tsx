@@ -69,6 +69,7 @@ export const ShopBestellVerwaltung: React.FC = () => {
   const loadBestellungen = async () => {
     try {
       setLoading(true);
+      console.log('🔄 STARTING LOAD - Orders and Positions...');
       
       // Lade Bestellungen aus der einfachen Tabelle
       const { data: bestellungenData, error: bestellungenError } = await supabase
