@@ -84,11 +84,14 @@ export const ShopBestellVerwaltung: React.FC = () => {
       console.log('🔄 STARTING LOAD - Orders and Positions...');
       console.log('🕰️ Current time:', new Date().toISOString());
       
-      // Lade Bestellungen aus der einfachen Tabelle (mit Cache-Bypass)
+      // Lade Bestellungen aus der einfachen Tabelle (mit Cache-Bypass und Fehlerbehandlung)
+      console.log('💾 Querying table: simple_bestellungen_2025_11_06_21_00');
       const { data: bestellungenData, error: bestellungenError } = await supabase
         .from('simple_bestellungen_2025_11_06_21_00')
         .select('*')
         .order('created_at', { ascending: false });
+      
+      console.log('💾 Query result:', { data: bestellungenData, error: bestellungenError });
       
       console.log('📦 Raw orders from database:', bestellungenData?.length || 0, 'orders');
       console.log('📦 Latest order timestamp:', bestellungenData?.[0]?.created_at);
