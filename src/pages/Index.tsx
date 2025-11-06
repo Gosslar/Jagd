@@ -14,7 +14,7 @@ import { Footer } from '@/components/Footer';
 import { News } from '@/components/News';
 import { AuthProvider, useAuth } from '@/contexts/AuthProvider';
 import { ShopVerwaltung } from '@/components/ShopVerwaltung';
-import { ShopBestellVerwaltungDebug } from '@/components/ShopBestellVerwaltungDebug';
+import { ShopBestellVerwaltung } from '@/components/ShopBestellVerwaltung';
 import { BenutzerVerwaltung } from '@/components/BenutzerVerwaltung';
 import { ErweiterteBenutzerverwaltung } from '@/components/ErweiterteBenutzerverwaltung';
 
@@ -49,7 +49,7 @@ const IndexContent = () => {
       {showAdminAreas && (
         <>
           <ShopVerwaltung />
-          <ShopBestellVerwaltungDebug />
+          <ShopBestellVerwaltung />
           <VeranstaltungsVerwaltung />
           <BlogVerwaltungSimple />
           <KontaktVerwaltung />
