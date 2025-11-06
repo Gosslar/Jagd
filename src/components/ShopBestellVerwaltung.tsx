@@ -199,15 +199,31 @@ export const ShopBestellVerwaltung: React.FC = () => {
       const doc = new jsPDF();
       const bestellPositionen = positionen[bestellung.id] || [];
       
-      // Header
-      doc.setFontSize(20);
-      doc.text('Lieferschein', 20, 30);
+      // Jagdliches Design - Grüne Farben
+      const jagdGruen = [34, 139, 34];
+      const dunkelGruen = [0, 100, 0];
+      
+      // Jagdlicher Header mit grünem Hintergrund
+      doc.setFillColor(...jagdGruen);
+      doc.rect(0, 0, 210, 40, 'F');
+      
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(24);
+      doc.text('🦌 JAGDREVIER LIEFERSCHEIN 🦌', 105, 25, { align: 'center' });
+      
+      // Zurück zu schwarzer Schrift
+      doc.setTextColor(0, 0, 0);
       
       // Bestellinformationen
-      doc.setFontSize(12);
-      doc.text(`Bestellnummer: ${bestellung.bestellnummer}`, 20, 50);
-      doc.text(`Datum: ${new Date(bestellung.bestelldatum).toLocaleDateString('de-DE')}`, 20, 60);
-      doc.text(`Status: ${bestellung.status}`, 20, 70);
+      doc.setFontSize(14);
+      doc.setTextColor(...dunkelGruen);
+      doc.text('📋 BESTELLINFORMATIONEN', 20, 55);
+      
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(11);
+      doc.text(`Bestellnummer: ${bestellung.bestellnummer}`, 20, 70);
+      doc.text(`Datum: ${new Date(bestellung.bestelldatum).toLocaleDateString('de-DE')}`, 20, 80);
+      doc.text(`Status: ${bestellung.status.toUpperCase()}`, 20, 90);
       
       // Kundeninformationen
       doc.text('Kunde:', 20, 90);
