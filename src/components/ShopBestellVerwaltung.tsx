@@ -100,15 +100,20 @@ export const ShopBestellVerwaltung: React.FC = () => {
       setBestellungen(convertedBestellungen);
 
       // Lade Bestellpositionen
+      console.log('Loading positions from database...');
       const { data: positionenData, error: positionenError } = await supabase
         .from('simple_bestellpositionen_2025_11_06_21_00')
         .select('*');
+      
+      console.log('Positions data:', positionenData);
+      console.log('Positions error:', positionenError);
 
       if (positionenError) throw positionenError;
 
       // Gruppiere Positionen nach Bestellung
       const positionenMap: { [key: string]: BestellPosition[] } = {};
       positionenData?.forEach(position => {
+        console.log('Processing position:', position);
         if (!positionenMap[position.bestellung_id]) {
           positionenMap[position.bestellung_id] = [];
         }
