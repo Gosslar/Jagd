@@ -231,9 +231,7 @@ export const ShopBestellVerwaltung: React.FC = () => {
         yPos += 20;
       }
       
-      // Gesamtpreis
-      doc.setFontSize(14);
-      doc.text(`Gesamtpreis: ${bestellung.gesamtpreis.toFixed(2)}€`, 20, yPos + 20);
+      // Gesamtpreis entfernt - keine Preise im PDF
       
       // Notizen
       if (bestellung.notizen) {
