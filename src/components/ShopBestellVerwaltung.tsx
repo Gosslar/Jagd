@@ -70,12 +70,16 @@ export const ShopBestellVerwaltung: React.FC = () => {
     try {
       setLoading(true);
       console.log('🔄 STARTING LOAD - Orders and Positions...');
+      console.log('🕰️ Current time:', new Date().toISOString());
       
-      // Lade Bestellungen aus der einfachen Tabelle
+      // Lade Bestellungen aus der einfachen Tabelle (mit Cache-Bypass)
       const { data: bestellungenData, error: bestellungenError } = await supabase
         .from('simple_bestellungen_2025_11_06_21_00')
         .select('*')
         .order('created_at', { ascending: false });
+      
+      console.log('📦 Raw orders from database:', bestellungenData?.length || 0, 'orders');
+      console.log('📦 Latest order timestamp:', bestellungenData?.[0]?.created_at);
 
       if (bestellungenError) throw bestellungenError;
 
