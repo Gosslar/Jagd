@@ -201,11 +201,14 @@ export const WildfleischShop: React.FC = () => {
       const gesamtpreis = getTotal();
       
       // Direkte Datenbank-Speicherung mit Zeitstempel
-      console.log('💾 SHOP: Speichere neue Bestellung...', {
+      const currentTime = new Date().toISOString();
+      console.log('🔴 SHOP KRITISCHER TEST: Speichere neue Bestellung...', {
         name: formData.name,
         email: formData.email,
         gesamtpreis: gesamtpreis,
-        warenkorb_artikel: warenkorb.length
+        warenkorb_artikel: warenkorb.length,
+        timestamp: currentTime,
+        tabelle: 'simple_bestellungen_2025_11_06_21_00'
       });
       
       const { data: bestellungData, error: bestellungError } = await supabase
