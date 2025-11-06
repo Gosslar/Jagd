@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jagdrevier Weetzen - Fallback</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #2c5530 0%, #4a7c59 100%);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .status-banner {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .main-content {
+            background: white;
+            margin: 2rem 0;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .section {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            border-left: 4px solid #4a7c59;
+            background: #f8f9fa;
+        }
+        
+        .section h2 {
+            color: #2c5530;
+            margin-bottom: 1rem;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-top: 3px solid #4a7c59;
+        }
+        
+        .card h3 {
+            color: #2c5530;
+            margin-bottom: 1rem;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: #4a7c59;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 10px 5px;
+            transition: background 0.3s;
+        }
+        
+        .btn:hover {
+            background: #2c5530;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+        }
+        
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+        
+        footer {
+            background: #2c5530;
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4a7c59;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 0 10px;
+            }
+            
+            .main-content {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>🦌 Jagdrevier Weetzen</h1>
+            <p class="subtitle">Professionelle Jagd und nachhaltiges Wildtiermanagement</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="status-banner" id="status-banner">
+            <div class="loading-spinner"></div>
+            <strong>Lade Hauptanwendung...</strong>
+            <p>Falls die Seite nicht lädt, verwenden Sie die Fallback-Version unten.</p>
+        </div>
+
+        <div class="main-content" id="fallback-content" style="display: none;">
+            <h2>🏠 Willkommen im Jagdrevier Weetzen</h2>
+            <p>Diese Fallback-Version wird angezeigt, falls die Hauptanwendung nicht geladen werden kann.</p>
+            
+            <div class="grid">
+                <div class="card">
+                    <h3>🦌 Über uns</h3>
+                    <p>Das Jagdrevier Weetzen ist ein professionell geführtes Jagdrevier mit Fokus auf nachhaltiges Wildtiermanagement und Naturschutz.</p>
+                </div>
+                
+                <div class="card">
+                    <h3>🥩 Wildfleisch-Shop</h3>
+                    <p>Hochwertiges Wildfleisch aus heimischen Wäldern. Frisch, nachhaltig und von höchster Qualität.</p>
+                </div>
+                
+                <div class="card">
+                    <h3>🐕 Jagdhunde</h3>
+                    <p>Professionelle Jagdhundeausbildung und -führung für verschiedene Jagdarten und Wildarten.</p>
+                </div>
+                
+                <div class="card">
+                    <h3>🦆 Wildarten</h3>
+                    <p>Umfassende Informationen über die verschiedenen Wildarten in unserem Revier.</p>
+                </div>
+                
+                <div class="card">
+                    <h3>🛡️ Prädatorenmanagement</h3>
+                    <p>Professionelles Management von Prädatoren zum Schutz der heimischen Wildbestände.</p>
+                </div>
+                
+                <div class="card">
+                    <h3>🦌 Rehkitzrettung</h3>
+                    <p>Moderne Rehkitzrettung mit Drohnentechnologie zum Schutz der Jungtiere.</p>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>🔧 Technische Informationen</h2>
+                <p>Falls Sie diese Seite sehen, konnte die Hauptanwendung nicht geladen werden. Mögliche Ursachen:</p>
+                <ul style="margin: 1rem 0; padding-left: 2rem;">
+                    <li>JavaScript ist deaktiviert</li>
+                    <li>Netzwerkprobleme</li>
+                    <li>Browser-Kompatibilitätsprobleme</li>
+                    <li>Supabase-Verbindungsprobleme</li>
+                </ul>
+                
+                <div style="margin-top: 2rem;">
+                    <a href="/diagnose.html" class="btn">🔍 Diagnose ausführen</a>
+                    <a href="javascript:location.reload()" class="btn btn-secondary">🔄 Seite neu laden</a>
+                    <a href="javascript:enableJavaScript()" class="btn btn-secondary">⚙️ JavaScript prüfen</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Jagdrevier Weetzen. Alle Rechte vorbehalten.</p>
+            <p>Professionelle Jagd • Nachhaltiges Wildtiermanagement • Naturschutz</p>
+        </div>
+    </footer>
+
+    <!-- React App Container -->
+    <div id="root"></div>
+
+    <script>
+        // Fallback-Logik
+        let fallbackTimer;
+        let reactLoaded = false;
+
+        function showFallback() {
+            document.getElementById('status-banner').style.display = 'none';
+            document.getElementById('fallback-content').style.display = 'block';
+        }
+
+        function hideFallback() {
+            document.getElementById('status-banner').style.display = 'none';
+            document.getElementById('fallback-content').style.display = 'none';
+            reactLoaded = true;
+        }
+
+        function enableJavaScript() {
+            alert('JavaScript ist bereits aktiviert. Das Problem liegt möglicherweise woanders. Versuchen Sie die Diagnose-Seite.');
+        }
+
+        // Prüfe ob React geladen wird
+        function checkReactApp() {
+            const rootElement = document.getElementById('root');
+            if (rootElement && rootElement.children.length > 0) {
+                hideFallback();
+                return true;
+            }
+            return false;
+        }
+
+        // Überwache React-Container
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.type === 'childList' && mutation.target.id === 'root') {
+                    if (mutation.target.children.length > 0) {
+                        hideFallback();
+                        observer.disconnect();
+                    }
+                }
+            });
+        });
+
+        // Starte Überwachung
+        document.addEventListener('DOMContentLoaded', function() {
+            const rootElement = document.getElementById('root');
+            if (rootElement) {
+                observer.observe(rootElement, { childList: true, subtree: true });
+            }
+
+            // Fallback nach 5 Sekunden anzeigen
+            fallbackTimer = setTimeout(function() {
+                if (!checkReactApp()) {
+                    showFallback();
+                }
+            }, 5000);
+
+            // Prüfe alle 1 Sekunde
+            const checkInterval = setInterval(function() {
+                if (checkReactApp()) {
+                    clearInterval(checkInterval);
+                    clearTimeout(fallbackTimer);
+                }
+            }, 1000);
+        });
+
+        // Console-Logging für Debugging
+        console.log('🦌 Jagdrevier Weetzen - Fallback-System geladen');
+        console.log('Warte auf React-App...');
+        
+        // Fehler-Logging
+        window.addEventListener('error', function(e) {
+            console.error('JavaScript-Fehler:', e.error);
+        });
+
+        window.addEventListener('unhandledrejection', function(e) {
+            console.error('Unbehandelte Promise-Ablehnung:', e.reason);
+        });
+    </script>
+
+    <!-- Lade die React-App -->
+    <script type="module" src="/src/main.tsx"></script>
+</body>
+</html>
