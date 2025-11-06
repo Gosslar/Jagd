@@ -194,8 +194,13 @@ export const WildfleischShop: React.FC = () => {
     }
 
     setSubmitting(true);
+    
+    console.log('🔴 SHOP FORM SUBMIT GESTARTET!');
+    console.log('📎 Warenkorb:', warenkorb);
+    console.log('📎 Form Data:', formData);
 
     try {
+      console.log('🚀 SHOP: Try-Block erreicht!');
       console.log('Submitting order:', { formData, warenkorb });
       
       const gesamtpreis = getTotal();
