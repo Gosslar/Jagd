@@ -105,8 +105,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
       
       console.log('🔑 Signup result:', { data, error });
-        }
-      });
 
       if (error) throw error;
       
