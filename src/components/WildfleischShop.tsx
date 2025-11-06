@@ -200,7 +200,14 @@ export const WildfleischShop: React.FC = () => {
       
       const gesamtpreis = getTotal();
       
-      // Direkte Datenbank-Speicherung mit einfachen Tabellen
+      // Direkte Datenbank-Speicherung mit Zeitstempel
+      console.log('💾 SHOP: Speichere neue Bestellung...', {
+        name: formData.name,
+        email: formData.email,
+        gesamtpreis: gesamtpreis,
+        warenkorb_artikel: warenkorb.length
+      });
+      
       const { data: bestellungData, error: bestellungError } = await supabase
         .from('simple_bestellungen_2025_11_06_21_00')
         .insert({
@@ -210,7 +217,9 @@ export const WildfleischShop: React.FC = () => {
           adresse: formData.address,
           nachricht: formData.nachricht,
           gesamtpreis: gesamtpreis,
-          status: 'neu'
+          status: 'neu',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
         })
         .select()
         .single();
@@ -220,15 +229,22 @@ export const WildfleischShop: React.FC = () => {
         throw new Error(`Bestellung konnte nicht erstellt werden: ${bestellungError.message}`);
       }
       
-      console.log('Bestellung erstellt:', bestellungData);
+      console.log('✅ SHOP: Bestellung erfolgreich erstellt:', {
+        id: bestellungData.id,
+        name: bestellungData.name,
+        email: bestellungData.email,
+        gesamtpreis: bestellungData.gesamtpreis,
+        created_at: bestellungData.created_at
+      });
       
-      // Bestellpositionen mit echten Warenkorb-Artikeln hinzufügen
+      // Bestellpositionen mit Zeitstempel hinzufügen
       const bestellpositionen = warenkorb.map(item => ({
         bestellung_id: bestellungData.id,
         produkt_name: item.produkt,
         menge: item.menge,
         einzelpreis: item.preis,
-        gesamtpreis: item.menge * item.preis
+        gesamtpreis: item.menge * item.preis,
+        created_at: new Date().toISOString()
       }));
       
       console.log('🛒 Speichere echte Warenkorb-Artikel:', bestellpositionen);
@@ -247,11 +263,12 @@ export const WildfleischShop: React.FC = () => {
         throw new Error(`Bestellpositionen konnten nicht erstellt werden: ${positionenError.message}`);
       }
       
-      console.log('Bestellpositionen erstellt:', bestellpositionen.length);
+      console.log('✅ SHOP: Bestellpositionen erfolgreich erstellt:', bestellpositionen.length);
+      console.log('🎉 SHOP: Bestellung komplett - sollte jetzt in Bestellverwaltung erscheinen!');
 
       toast({
         title: "Bestellung gesendet",
-        description: "Ihre Bestellung wurde erfolgreich übermittelt. Sie erhalten eine Bestätigung per E-Mail.",
+        description: `Ihre Bestellung wurde erfolgreich übermittelt. Bestellnummer: #${bestellungData.id.slice(-8)}`,
       });
 
       // Formular und Warenkorb zurücksetzen
