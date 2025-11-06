@@ -625,7 +625,17 @@ export const ShopBestellVerwaltung: React.FC = () => {
             <ShoppingCart className="h-6 w-6" />
             Bestellverwaltung mit Status-Tabs
           </CardTitle>
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-2">
+            <Button
+              onClick={deleteAllBestellungen}
+              variant="destructive"
+              size="sm"
+              className="bg-red-600 hover:bg-red-700 text-white"
+              title="ALLE Bestellungen löschen (Vorsicht!)"
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Alle löschen
+            </Button>
             <Button onClick={loadBestellungen} variant="outline" size="sm">
               <RefreshCw className="h-4 w-4 mr-2" />
               Aktualisieren
