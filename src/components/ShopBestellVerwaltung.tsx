@@ -72,7 +72,7 @@ export const ShopBestellVerwaltung: React.FC = () => {
       
       // Lade Bestellungen aus der einfachen Tabelle
       const { data: bestellungenData, error: bestellungenError } = await supabase
-        .from('simple_bestellungen_2025_10_31_12_00')
+        .from('simple_bestellungen_2025_11_06_21_00')
         .select('*')
         .order('created_at', { ascending: false });
 
