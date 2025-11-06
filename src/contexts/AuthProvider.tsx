@@ -92,12 +92,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUp = async (email: string, password: string, userData?: { full_name?: string }) => {
     try {
-      // Verwende verbesserte Edge Function für Registrierung
-      const { data, error } = await supabase.functions.invoke('improved_user_registration_2025_10_31_11_00', {
-        body: {
-          email,
-          password,
-          userData
+      console.log('🔑 Starting signup process...', { email, userData });
+      
+      // Direkte Supabase Auth Registrierung (ohne Edge Function)
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`,
+          data: userData || {}
+        }
+      });
+      
+      console.log('🔑 Signup result:', { data, error });
         }
       });
 
