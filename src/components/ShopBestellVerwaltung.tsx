@@ -63,8 +63,20 @@ export const ShopBestellVerwaltung: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [notizen, setNotizen] = useState('');
   const [activeTab, setActiveTab] = useState('alle');
+  const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
   const { toast } = useToast();
   const { user } = useAuth();
+  
+  // Auto-refresh alle 30 Sekunden für neue Bestellungen
+  useEffect(() => {
+    const interval = setInterval(() => {
+      console.log('🔄 Auto-refresh: Checking for new orders...');
+      loadBestellungen();
+      setLastRefresh(new Date());
+    }, 30000); // 30 Sekunden
+    
+    return () => clearInterval(interval);
+  }, []);
 
   const loadBestellungen = async () => {
     try {
