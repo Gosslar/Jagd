@@ -272,10 +272,15 @@ export const ProfessionalWildfleischShop: React.FC = () => {
   };
 
   const submitBestellung = async () => {
+    console.log('🔴 PROFESSIONAL SHOP FORM SUBMIT GESTARTET!');
+    console.log('📎 Warenkorb:', warenkorb);
+    console.log('📎 Form Data:', formData);
+    
     if (warenkorb.length === 0) {
+      console.log('❌ PROFESSIONAL SHOP: Warenkorb ist leer!');
       toast({
         title: "Warenkorb leer",
-        description: "Bitte fügen Sie Produkte zum Warenkorb hinzu.",
+        description: "Fügen Sie Produkte zum Warenkorb hinzu.",
         variant: "destructive",
       });
       return;
@@ -292,10 +297,25 @@ export const ProfessionalWildfleischShop: React.FC = () => {
 
     try {
       setSubmitting(true);
+      console.log('🚀 PROFESSIONAL SHOP: Try-Block erreicht!');
       
-      // Erstelle Bestellung
+      const gesamtpreis = getGesamtpreis();
+      console.log('💰 PROFESSIONAL SHOP: Gesamtpreis berechnet:', gesamtpreis);
+      
+      // KRITISCHER FIX: Speichere in die RICHTIGE Tabelle!
+      const currentTime = new Date().toISOString();
+      console.log('🔴 PROFESSIONAL SHOP KRITISCHER TEST: Speichere neue Bestellung...', {
+        name: formData.name,
+        email: formData.email,
+        gesamtpreis: gesamtpreis,
+        warenkorb_artikel: warenkorb.length,
+        timestamp: currentTime,
+        tabelle: 'simple_bestellungen_2025_11_06_21_00'
+      });
+      
+      // Erstelle Bestellung in der RICHTIGEN Tabelle
       const { data: bestellungData, error: bestellungError } = await supabase
-        .from('simple_bestellungen_2025_10_31_12_00')
+        .from('simple_bestellungen_2025_11_06_21_00')
         .insert({
           name: formData.name,
           email: formData.email,
