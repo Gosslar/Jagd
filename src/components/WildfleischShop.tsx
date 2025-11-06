@@ -202,7 +202,7 @@ export const WildfleischShop: React.FC = () => {
       
       // Direkte Datenbank-Speicherung mit einfachen Tabellen
       const { data: bestellungData, error: bestellungError } = await supabase
-        .from('simple_bestellungen_2025_10_31_12_00')
+        .from('simple_bestellungen_2025_11_06_21_00')
         .insert({
           name: formData.name,
           email: formData.email,
