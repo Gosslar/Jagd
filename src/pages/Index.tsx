@@ -49,7 +49,7 @@ const IndexContent = () => {
       {showAdminAreas && (
         <>
           <ShopVerwaltung />
-          <BestellVerwaltung />
+          <ShopBestellVerwaltung />
           <VeranstaltungsVerwaltung />
           <BlogVerwaltungSimple />
           <KontaktVerwaltung />
