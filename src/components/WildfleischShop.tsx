@@ -222,7 +222,7 @@ export const WildfleischShop: React.FC = () => {
       
       console.log('Bestellung erstellt:', bestellungData);
       
-      // Bestellpositionen hinzufügen
+      // Bestellpositionen mit echten Warenkorb-Artikeln hinzufügen
       const bestellpositionen = warenkorb.map(item => ({
         bestellung_id: bestellungData.id,
         produkt_name: item.produkt,
@@ -231,8 +231,10 @@ export const WildfleischShop: React.FC = () => {
         gesamtpreis: item.menge * item.preis
       }));
       
+      console.log('🛒 Speichere echte Warenkorb-Artikel:', bestellpositionen);
+      
       const { error: positionenError } = await supabase
-        .from('simple_bestellpositionen_2025_10_31_12_00')
+        .from('simple_bestellpositionen_2025_11_06_21_00')
         .insert(bestellpositionen);
       
       if (positionenError) {
