@@ -26,7 +26,12 @@ export const useAdminStatus = (): AdminStatus => {
 
   useEffect(() => {
     const checkAdminStatus = async () => {
-      if (authLoading) return;
+      console.log('🔍 useAdminStatus: checking status', { user: !!user, authLoading });
+      
+      if (authLoading) {
+        console.log('⏳ useAdminStatus: auth still loading');
+        return;
+      }
       
       if (!user) {
         setAdminStatus({
