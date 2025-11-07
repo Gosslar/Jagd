@@ -284,6 +284,35 @@ export const ShopBestellVerwaltung: React.FC = () => {
     }
   };
 
+  // Funktion zum Löschen aller Bestellungen
+  const deleteAllBestellungen = async () => {
+    try {
+      console.log('🗑️ Lösche alle Bestellungen...');
+      
+      const confirmed = window.confirm('ACHTUNG: Alle Bestellungen löschen?');
+      if (!confirmed) return;
+      
+      const doubleConfirmed = window.confirm('Sind Sie sicher?');
+      if (!doubleConfirmed) return;
+      
+      setLoading(true);
+      
+      // Lösche Bestellpositionen
+      await supabase.from('simple_bestellpositionen_2025_11_06_21_00').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      
+      // Lösche Bestellungen
+      await supabase.from('simple_bestellungen_2025_11_06_21_00').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      
+      toast({ title: "Alle Bestellungen gelöscht" });
+      await loadBestellungen();
+      
+    } catch (error: any) {
+      toast({ title: "Fehler", description: error.message, variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const generatePDF = async (bestellung: ShopBestellung) => {
     try {
       // Dynamischer Import von jsPDF
