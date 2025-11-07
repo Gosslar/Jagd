@@ -45,6 +45,9 @@ interface ShopBestellung {
   zahlungsstatus: string;
   lieferstatus: string;
   notizen?: string;
+  bezahlt: boolean;
+  geliefert: boolean;
+  lieferdatum?: string;
   created_at: string;
   updated_at: string;
 }
@@ -284,6 +287,75 @@ export const ShopBestellVerwaltung: React.FC = () => {
     }
   };
 
+  // Funktion zum Aktualisieren des Bezahlt-Status
+  const updateBezahltStatus = async (bestellungId: string, bezahlt: boolean) => {
+    try {
+      console.log(`💳 Aktualisiere Bezahlt-Status für Bestellung ${bestellungId}: ${bezahlt}`);
+      
+      const { error } = await supabase
+        .from('simple_bestellungen_2025_11_06_21_00')
+        .update({ bezahlt })
+        .eq('id', bestellungId);
+      
+      if (error) {
+        console.error('Fehler beim Aktualisieren des Bezahlt-Status:', error);
+        throw error;
+      }
+      
+      toast({
+        title: bezahlt ? "Als bezahlt markiert" : "Als unbezahlt markiert",
+        description: `Bestellung wurde als ${bezahlt ? 'bezahlt' : 'unbezahlt'} markiert.`,
+      });
+      
+      await loadBestellungen();
+    } catch (error: any) {
+      toast({
+        title: "Fehler beim Aktualisieren",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Funktion zum Aktualisieren des Geliefert-Status
+  const updateGeliefertStatus = async (bestellungId: string, geliefert: boolean) => {
+    try {
+      console.log(`📦 Aktualisiere Geliefert-Status für Bestellung ${bestellungId}: ${geliefert}`);
+      
+      const updateData: any = { geliefert };
+      
+      // Setze Lieferdatum wenn als geliefert markiert
+      if (geliefert) {
+        updateData.lieferdatum = new Date().toISOString();
+      } else {
+        updateData.lieferdatum = null;
+      }
+      
+      const { error } = await supabase
+        .from('simple_bestellungen_2025_11_06_21_00')
+        .update(updateData)
+        .eq('id', bestellungId);
+      
+      if (error) {
+        console.error('Fehler beim Aktualisieren des Geliefert-Status:', error);
+        throw error;
+      }
+      
+      toast({
+        title: geliefert ? "Als geliefert markiert" : "Als nicht geliefert markiert",
+        description: `Bestellung wurde als ${geliefert ? 'geliefert' : 'nicht geliefert'} markiert.`,
+      });
+      
+      await loadBestellungen();
+    } catch (error: any) {
+      toast({
+        title: "Fehler beim Aktualisieren",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   // Funktion zum Löschen aller Bestellungen
   const deleteAllBestellungen = async () => {
     try {
@@ -482,6 +554,8 @@ export const ShopBestellVerwaltung: React.FC = () => {
         <TableRow>
           <TableHead>Bestellnummer</TableHead>
           <TableHead>Status</TableHead>
+          <TableHead>Bezahlt</TableHead>
+          <TableHead>Geliefert</TableHead>
           <TableHead>Kunde</TableHead>
           <TableHead>E-Mail</TableHead>
           <TableHead>Gesamtpreis</TableHead>
