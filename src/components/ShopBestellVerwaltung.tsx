@@ -421,6 +421,136 @@ export const ShopBestellVerwaltung: React.FC = () => {
     }
   };
 
+  // Neue Lieferschein-PDF Funktion basierend auf Lieferschein_B Vorlage
+  const generateLieferschein = async (bestellung: ShopBestellung) => {
+    try {
+      console.log('📦 Generiere Lieferschein für Bestellung:', bestellung.bestellnummer);
+      
+      // Dynamischer Import von jsPDF
+      const { jsPDF } = await import('jspdf');
+      
+      // Lade Bestellpositionen
+      const { data: bestellPositionen } = await supabase
+        .from('simple_bestellpositionen_2025_11_06_21_00')
+        .select('*')
+        .eq('bestellung_id', bestellung.id);
+      
+      const doc = new jsPDF();
+      
+      // === HEADER BEREICH ===
+      // Firmenname (groß und fett)
+      doc.setFontSize(20);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Jagd Weetzen', 20, 25);
+      
+      // Firmenadresse
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.text('Am Denkmal 16 • 30952 Linderte', 20, 35);
+      doc.text('Tel: +49 172 5265166 • info@jagd-weetzen.de', 20, 42);
+      
+      // LIEFERSCHEIN Titel (groß und zentriert)
+      doc.setFontSize(18);
+      doc.setFont('helvetica', 'bold');
+      doc.text('LIEFERSCHEIN', 105, 60, { align: 'center' });
+      
+      // === LIEFERADRESSE BEREICH ===
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Lieferadresse:', 20, 80);
+      
+      doc.setFont('helvetica', 'normal');
+      doc.text(bestellung.kunde_name, 20, 90);
+      doc.text(`E-Mail: ${bestellung.kunde_email}`, 20, 97);
+      doc.text(`Tel: ${bestellung.kunde_telefon}`, 20, 104);
+      
+      // Adresse (falls vorhanden)
+      if (bestellung.kunde_adresse) {
+        const adressLines = bestellung.kunde_adresse.split('\n');
+        let yPos = 111;
+        adressLines.forEach(line => {
+          doc.text(line, 20, yPos);
+          yPos += 7;
+        });
+      }
+      
+      // === LIEFERSCHEIN DETAILS ===
+      const lieferscheinNr = `LS-${bestellung.bestellnummer.replace('#', '')}`;
+      const heute = new Date().toLocaleDateString('de-DE');
+      const abholzeit = '10:00'; // Standard Abholzeit
+      
+      doc.setFontSize(10);
+      doc.text(`Lieferschein-Nr.: ${lieferscheinNr}`, 20, 140);
+      doc.text(`Bestellnummer: ${bestellung.bestellnummer}`, 20, 147);
+      doc.text(`Datum: ${heute}`, 20, 154);
+      doc.text(`Abholung: ${heute} um ${abholzeit}`, 20, 161);
+      doc.text(`Status: ${bestellung.status}`, 20, 168);
+      
+      // === ARTIKEL TABELLE (OHNE PREISE) ===
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'bold');
+      
+      // Tabellen-Header
+      const startY = 185;
+      doc.text('Pos.', 20, startY);
+      doc.text('Artikel', 40, startY);
+      doc.text('Menge', 150, startY);
+      
+      // Linie unter Header
+      doc.line(20, startY + 3, 180, startY + 3);
+      
+      // Artikel auflisten
+      doc.setFont('helvetica', 'normal');
+      let yPos = startY + 15;
+      
+      if (bestellPositionen && bestellPositionen.length > 0) {
+        bestellPositionen.forEach((position, index) => {
+          doc.text(`${index + 1}`, 20, yPos);
+          doc.text(position.produkt_name, 40, yPos);
+          doc.text(`${position.menge}`, 150, yPos);
+          yPos += 12;
+        });
+      } else {
+        doc.text('Keine Artikel gefunden', 40, yPos);
+        yPos += 12;
+      }
+      
+      // === UNTERSCHRIFTSBEREICH ===
+      const signatureY = Math.max(yPos + 30, 240);
+      
+      // Linie für Unterschrift
+      doc.line(20, signatureY, 90, signatureY);
+      doc.text('Unterschrift Empfänger', 20, signatureY + 10);
+      
+      doc.line(110, signatureY, 180, signatureY);
+      doc.text('Datum / Uhrzeit', 110, signatureY + 10);
+      
+      // === FOOTER ===
+      doc.setFontSize(8);
+      doc.text('Jagd Weetzen - Nachhaltige Jagd in Niedersachsen', 20, 280);
+      doc.text('Vielen Dank für Ihr Vertrauen!', 20, 287);
+      
+      // PDF speichern
+      const fileName = `Lieferschein_${bestellung.bestellnummer.replace('#', '')}_${heute.replace(/\./g, '-')}.pdf`;
+      doc.save(fileName);
+      
+      console.log('✅ Lieferschein erfolgreich generiert:', fileName);
+      
+      toast({
+        title: "Lieferschein erstellt",
+        description: `Lieferschein ${lieferscheinNr} wurde erfolgreich generiert.`,
+      });
+      
+    } catch (error: any) {
+      console.error('Fehler beim Generieren des Lieferscheins:', error);
+      toast({
+        title: "Fehler beim Generieren",
+        description: "Der Lieferschein konnte nicht erstellt werden.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const generatePDF = async (bestellung: ShopBestellung) => {
     try {
       // Dynamischer Import von jsPDF
