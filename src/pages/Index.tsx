@@ -25,8 +25,23 @@ import { useAdminStatus } from '@/hooks/useAdminStatus';
 import { Toaster } from '@/components/ui/toaster';
 
 const IndexContent = () => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const { isAdmin, isLagerAdmin, isSuperAdmin, adminLoading } = useAdminStatus();
+
+  console.log('📊 Index render state:', { user: !!user, loading, adminLoading, isAdmin });
+  
+  // Zeige Loading-Spinner während Auth lädt
+  if (loading) {
+    console.log('⏳ Auth loading...');
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-200 to-green-400 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-800 mx-auto"></div>
+          <p className="mt-4 text-green-800 font-semibold">Lade Jagd Weetzen...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Admin-Bereiche nur für angemeldete Administratoren anzeigen
   const showAdminAreas = user && isAdmin && !adminLoading;
