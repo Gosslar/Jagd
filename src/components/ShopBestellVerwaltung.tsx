@@ -780,7 +780,7 @@ export const ShopBestellVerwaltung: React.FC = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => openBestellungDetails(bestellung)}
+
                       title="Details anzeigen"
                     >
                       <Eye className="h-4 w-4" />
@@ -788,9 +788,9 @@ export const ShopBestellVerwaltung: React.FC = () => {
                   </DialogTrigger>
                   <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
                     <DialogHeader>
-                      <DialogTitle>Bestelldetails - {selectedBestellung?.bestellnummer || bestellung.bestellnummer}</DialogTitle>
+                      <DialogTitle>Bestelldetails - {bestellung.bestellnummer}</DialogTitle>
                     </DialogHeader>
-                    {selectedBestellung && selectedBestellung.id === bestellung.id && (
+                    <div className="space-y-6">
                       <div className="space-y-6">
                         {/* Kundeninformationen */}
                         <div className="grid grid-cols-2 gap-4">
@@ -800,10 +800,10 @@ export const ShopBestellVerwaltung: React.FC = () => {
                               Bestellinformationen
                             </h3>
                             <div className="space-y-2 text-sm">
-                              <p><strong>Bestellnummer:</strong> {selectedBestellung.bestellnummer}</p>
-                              <p><strong>Datum:</strong> {new Date(selectedBestellung.bestelldatum).toLocaleDateString('de-DE')}</p>
-                              <p><strong>Status:</strong> {getStatusBadge(selectedBestellung.status)}</p>
-                              <p><strong>Gesamtpreis:</strong> {selectedBestellung.gesamtpreis.toFixed(2)}€</p>
+                              <p><strong>Bestellnummer:</strong> {bestellung.bestellnummer}</p>
+                              <p><strong>Datum:</strong> {new Date(bestellung.bestelldatum).toLocaleDateString('de-DE')}</p>
+                              <p><strong>Status:</strong> {getStatusBadge(bestellung.status)}</p>
+                              <p><strong>Gesamtpreis:</strong> {bestellung.gesamtpreis.toFixed(2)}€</p>
                             </div>
                           </div>
                           <div>
@@ -812,10 +812,10 @@ export const ShopBestellVerwaltung: React.FC = () => {
                               Kundeninformationen
                             </h3>
                             <div className="space-y-2 text-sm">
-                              <p><strong>Name:</strong> {selectedBestellung.kunde_name}</p>
-                              <p><strong>E-Mail:</strong> {selectedBestellung.kunde_email}</p>
-                              <p><strong>Telefon:</strong> {selectedBestellung.kunde_telefon}</p>
-                              <p><strong>Adresse:</strong> {selectedBestellung.kunde_adresse}</p>
+                              <p><strong>Name:</strong> {bestellung.kunde_name}</p>
+                              <p><strong>E-Mail:</strong> {bestellung.kunde_email}</p>
+                              <p><strong>Telefon:</strong> {bestellung.kunde_telefon}</p>
+                              <p><strong>Adresse:</strong> {bestellung.kunde_adresse}</p>
                             </div>
                           </div>
                         </div>
@@ -833,8 +833,8 @@ export const ShopBestellVerwaltung: React.FC = () => {
                               </TableRow>
                             </TableHeader>
                             <TableBody>
-                              {(positionen[selectedBestellung.id] || []).length > 0 ? (
-                                positionen[selectedBestellung.id].map((position) => (
+                              {(positionen[bestellung.id] || []).length > 0 ? (
+                                positionen[bestellung.id].map((position) => (
                                   <TableRow key={position.id}>
                                     <TableCell>{position.produkt_name}</TableCell>
                                     <TableCell>{position.menge}</TableCell>
@@ -855,19 +855,12 @@ export const ShopBestellVerwaltung: React.FC = () => {
                         <div>
                           <h3 className="font-semibold mb-2">Notizen</h3>
                           <Textarea
-                            value={notizen}
-                            onChange={(e) => setNotizen(e.target.value)}
+                            value={bestellung.notizen || ''}
+                            readOnly
                             placeholder="Notizen zur Bestellung..."
                             className="min-h-[100px]"
                           />
-                          <Button
-                            onClick={() => updateNotizen(selectedBestellung.id)}
-                            className="mt-2"
-                            size="sm"
-                          >
-                            <Edit className="h-4 w-4 mr-2" />
-                            Notizen speichern
-                          </Button>
+
                         </div>
 
                         {/* Aktionen */}
@@ -880,7 +873,7 @@ export const ShopBestellVerwaltung: React.FC = () => {
                             Lieferschein (ohne Preise)
                           </Button>
                           <Button
-                            onClick={() => generatePDF(selectedBestellung)}
+                            onClick={() => generatePDF(bestellung)}
                             variant="outline"
                           >
                             <Download className="h-4 w-4 mr-2" />
