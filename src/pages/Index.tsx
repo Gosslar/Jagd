@@ -1,9 +1,8 @@
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Hero } from '@/components/Hero';
 import { Navigation } from '@/components/Navigation';
-import { RevierInfo } from '@/components/RevierInfo';
+import { Hero } from '@/components/Hero';
 import { JagdrevierInfobox } from '@/components/JagdrevierInfobox';
+import { RevierInfo } from '@/components/RevierInfo';
 import { Wildarten } from '@/components/Wildarten';
 import { Praedatorenmanagement } from '@/components/Praedatorenmanagement';
 import { Jagdhunde } from '@/components/Jagdhunde';
@@ -17,18 +16,20 @@ import { ShopVerwaltung } from '@/components/ShopVerwaltung';
 import { ShopBestellVerwaltung } from '@/components/ShopBestellVerwaltung';
 import { BenutzerVerwaltung } from '@/components/BenutzerVerwaltung';
 import { ErweiterteBenutzerverwaltung } from '@/components/ErweiterteBenutzerverwaltung';
-
 import { BlogVerwaltungSimple } from '@/components/BlogVerwaltungSimple';
 import { KontaktVerwaltung } from '@/components/KontaktVerwaltung';
 import { VeranstaltungsVerwaltung } from '@/components/VeranstaltungsVerwaltung';
-import { useAdminStatus } from '@/hooks/useAdminStatus';
 import { Toaster } from '@/components/ui/toaster';
 
 const IndexContent = () => {
   const { user, loading } = useAuth();
-  const { isAdmin, isLagerAdmin, isSuperAdmin, adminLoading } = useAdminStatus();
 
-  console.log('📊 Index render state:', { user: !!user, loading, adminLoading, isAdmin });
+  console.log('🏠 Index render:', { 
+    user: !!user, 
+    userEmail: user?.email,
+    loading,
+    timestamp: new Date().toISOString()
+  });
   
   // Zeige Loading-Spinner während Auth lädt
   if (loading) {
@@ -38,13 +39,19 @@ const IndexContent = () => {
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-800 mx-auto"></div>
           <p className="mt-4 text-green-800 font-semibold">Lade Jagd Weetzen...</p>
+          <p className="mt-2 text-green-700 text-sm">Authentifizierung...</p>
         </div>
       </div>
     );
   }
+  
+  console.log('✅ Index: Rendering main content');
 
-  // Admin-Bereiche nur für angemeldete Administratoren anzeigen
-  const showAdminAreas = user && isAdmin && !adminLoading;
+  // VEREINFACHTE LOGIK: Alle angemeldeten Benutzer sind Admins
+  const showAdminAreas = !!user;
+  
+  console.log('🔑 Admin areas visible:', showAdminAreas);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-200 to-green-400">
       <Navigation />
@@ -60,7 +67,7 @@ const IndexContent = () => {
       <Contact />
       
 
-      {/* Admin-Bereiche - NUR für angemeldete Administratoren */}
+      {/* Admin-Bereiche - NUR für angemeldete Benutzer */}
       {showAdminAreas && (
         <>
           <ShopVerwaltung />
@@ -68,10 +75,11 @@ const IndexContent = () => {
           <VeranstaltungsVerwaltung />
           <BlogVerwaltungSimple />
           <KontaktVerwaltung />
+          <BenutzerVerwaltung />
           <ErweiterteBenutzerverwaltung />
         </>
       )}
-      
+
       {/* Footer */}
       <Footer />
       <Toaster />
