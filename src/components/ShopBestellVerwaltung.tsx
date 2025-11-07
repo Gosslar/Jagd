@@ -118,8 +118,11 @@ export const ShopBestellVerwaltung: React.FC = () => {
         zahlungsstatus: 'offen',
         lieferstatus: 'vorbereitung',
         notizen: b.nachricht || '',
+        bezahlt: b.bezahlt || false,
+        geliefert: b.geliefert || false,
+        lieferdatum: b.lieferdatum || null,
         created_at: b.created_at,
-        updated_at: b.created_at
+        updated_at: b.updated_at || b.created_at
       }));
 
       setBestellungen(convertedBestellungen);
