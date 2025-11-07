@@ -299,10 +299,14 @@ export const ShopBestellVerwaltung: React.FC = () => {
       
       // Lösche Bestellpositionen
       console.log('🗑️ Schritt 1: Lösche alle Bestellpositionen...');
+      
+      // Verwende gt() mit einem sehr kleinen Wert um alle Datensätze zu löschen
       const { error: positionenError, count: positionenCount } = await supabase
         .from('simple_bestellpositionen_2025_11_06_21_00')
         .delete({ count: 'exact' })
-        .neq('id', '00000000-0000-0000-0000-000000000000');
+        .gt('created_at', '1900-01-01'); // Löscht alle Datensätze nach 1900
+      
+      console.log('📊 Bestellpositionen Lösch-Ergebnis:', { error: positionenError, count: positionenCount });
       
       if (positionenError) {
         console.error('❌ Fehler beim Löschen der Bestellpositionen:', positionenError);
