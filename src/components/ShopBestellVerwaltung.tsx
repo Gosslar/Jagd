@@ -572,6 +572,26 @@ export const ShopBestellVerwaltung: React.FC = () => {
             <TableCell>
               {getStatusBadge(bestellung.status)}
             </TableCell>
+            <TableCell>
+              <Button
+                variant={bestellung.bezahlt ? "default" : "outline"}
+                size="sm"
+                onClick={() => updateBezahltStatus(bestellung.id, !bestellung.bezahlt)}
+                className={bestellung.bezahlt ? "bg-green-600 hover:bg-green-700 text-white" : ""}
+              >
+                {bestellung.bezahlt ? '✅ Bezahlt' : '💳 Offen'}
+              </Button>
+            </TableCell>
+            <TableCell>
+              <Button
+                variant={bestellung.geliefert ? "default" : "outline"}
+                size="sm"
+                onClick={() => updateGeliefertStatus(bestellung.id, !bestellung.geliefert)}
+                className={bestellung.geliefert ? "bg-blue-600 hover:bg-blue-700 text-white" : ""}
+              >
+                {bestellung.geliefert ? '📦 Geliefert' : '🚚 Offen'}
+              </Button>
+            </TableCell>
             <TableCell>{bestellung.kunde_name}</TableCell>
             <TableCell>{bestellung.kunde_email}</TableCell>
             <TableCell>{bestellung.gesamtpreis.toFixed(2)}€</TableCell>
