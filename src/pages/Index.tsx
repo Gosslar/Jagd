@@ -1,9 +1,7 @@
 import React from 'react';
-import { ShopBestellVerwaltung } from '@/components/ShopBestellVerwaltung';
-import { Toaster } from '@/components/ui/toaster';
 
 const Index = () => {
-  console.log('🚀 SCHRITT 2 - Bestellverwaltung ohne Auth hinzufügen');
+  console.log('🚀 ZURÜCK ZUR FUNKTIONIERENDEN MINIMAL-VERSION');
 
   return (
     <div style={{ 
@@ -13,7 +11,7 @@ const Index = () => {
       fontFamily: 'Arial, sans-serif'
     }}>
       <div style={{ 
-        maxWidth: '1200px', 
+        maxWidth: '800px', 
         margin: '0 auto', 
         backgroundColor: 'white', 
         padding: '40px', 
@@ -26,9 +24,25 @@ const Index = () => {
           marginBottom: '30px',
           fontSize: '2.5rem'
         }}>
-          🦌 Jagd Weetzen - Bestellverwaltung
+          🦌 Jagd Weetzen
         </h1>
         
+        <div style={{ 
+          backgroundColor: '#fef3c7', 
+          padding: '20px', 
+          borderRadius: '8px',
+          border: '2px solid #f59e0b',
+          marginBottom: '30px'
+        }}>
+          <h2 style={{ color: '#92400e', margin: '0 0 10px 0' }}>
+            🔧 ZURÜCK ZUR FUNKTIONIERENDEN VERSION
+          </h2>
+          <p style={{ color: '#92400e', margin: '0' }}>
+            Die ShopBestellVerwaltung-Komponente verursacht das Problem.
+            Ich erstelle jetzt eine einfache Version ohne Auth-Abhängigkeiten.
+          </p>
+        </div>
+
         <div style={{ 
           backgroundColor: '#dcfce7', 
           padding: '20px', 
@@ -36,22 +50,38 @@ const Index = () => {
           border: '2px solid #16a34a',
           marginBottom: '30px'
         }}>
-          <h2 style={{ color: '#166534', margin: '0 0 10px 0' }}>
-            ✅ SCHRITT 2: Bestellverwaltung hinzugefügt
-          </h2>
-          <p style={{ color: '#166534', margin: '0' }}>
-            Bestellverwaltung ist jetzt verfügbar - OHNE Auth-System!
-            Alle Funktionen sollten arbeiten: Bestellliste, Popup, Lieferschein-PDF.
-          </p>
+          <h3 style={{ color: '#166534', margin: '0 0 15px 0' }}>
+            ✅ Diese Version funktioniert
+          </h3>
+          <ul style={{ color: '#166534', margin: '0', paddingLeft: '20px' }}>
+            <li>JavaScript lädt korrekt</li>
+            <li>React funktioniert</li>
+            <li>Keine Auth-Probleme</li>
+            <li>Basis für einfache Bestellverwaltung</li>
+          </ul>
         </div>
 
-        {/* Bestellverwaltung ohne Auth-Checks */}
-        <div style={{ marginTop: '40px' }}>
-          <ShopBestellVerwaltung />
+        <div style={{ 
+          textAlign: 'center',
+          padding: '20px',
+          backgroundColor: '#f3f4f6',
+          borderRadius: '8px'
+        }}>
+          <p style={{ 
+            color: '#374151', 
+            fontSize: '1.1rem',
+            margin: '0 0 10px 0'
+          }}>
+            🎯 <strong>Nächster Schritt:</strong>
+          </p>
+          <p style={{ 
+            color: '#6b7280', 
+            margin: '0'
+          }}>
+            Einfache Bestellverwaltung ohne Auth-Hooks erstellen
+          </p>
         </div>
       </div>
-      
-      <Toaster />
     </div>
   );
 };
