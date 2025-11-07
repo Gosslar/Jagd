@@ -298,12 +298,37 @@ export const ShopBestellVerwaltung: React.FC = () => {
       setLoading(true);
       
       // Lösche Bestellpositionen
-      await supabase.from('simple_bestellpositionen_2025_11_06_21_00').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      console.log('🗑️ Schritt 1: Lösche alle Bestellpositionen...');
+      const { error: positionenError, count: positionenCount } = await supabase
+        .from('simple_bestellpositionen_2025_11_06_21_00')
+        .delete({ count: 'exact' })
+        .neq('id', '00000000-0000-0000-0000-000000000000');
+      
+      if (positionenError) {
+        console.error('❌ Fehler beim Löschen der Bestellpositionen:', positionenError);
+        throw positionenError;
+      }
+      
+      console.log(`✅ ${positionenCount || 0} Bestellpositionen gelöscht`);
       
       // Lösche Bestellungen
-      await supabase.from('simple_bestellungen_2025_11_06_21_00').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      console.log('🗑️ Schritt 2: Lösche alle Bestellungen...');
+      const { error: bestellungenError, count: bestellungenCount } = await supabase
+        .from('simple_bestellungen_2025_11_06_21_00')
+        .delete({ count: 'exact' })
+        .neq('id', '00000000-0000-0000-0000-000000000000');
       
-      toast({ title: "Alle Bestellungen gelöscht" });
+      if (bestellungenError) {
+        console.error('❌ Fehler beim Löschen der Bestellungen:', bestellungenError);
+        throw bestellungenError;
+      }
+      
+      console.log(`✅ ${bestellungenCount || 0} Bestellungen gelöscht`);
+      
+      toast({
+        title: "Alle Bestellungen gelöscht",
+        description: `${bestellungenCount || 0} Bestellungen und ${positionenCount || 0} Bestellpositionen gelöscht.`,
+      });
       await loadBestellungen();
       
     } catch (error: any) {
