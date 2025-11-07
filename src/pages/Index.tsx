@@ -11,7 +11,6 @@ import { ProfessionalWildfleischShop } from '@/components/ProfessionalWildfleisc
 import { Contact } from '@/components/Contact';
 import { Footer } from '@/components/Footer';
 import { News } from '@/components/News';
-import { AuthProvider, useAuth } from '@/contexts/AuthProvider';
 import { ShopVerwaltung } from '@/components/ShopVerwaltung';
 import { ShopBestellVerwaltung } from '@/components/ShopBestellVerwaltung';
 import { BenutzerVerwaltung } from '@/components/BenutzerVerwaltung';
@@ -19,15 +18,11 @@ import { ErweiterteBenutzerverwaltung } from '@/components/ErweiterteBenutzerver
 import { BlogVerwaltungSimple } from '@/components/BlogVerwaltungSimple';
 import { KontaktVerwaltung } from '@/components/KontaktVerwaltung';
 import { VeranstaltungsVerwaltung } from '@/components/VeranstaltungsVerwaltung';
-import { useAdminStatus } from '@/hooks/useAdminStatus';
 import { Toaster } from '@/components/ui/toaster';
 
-const IndexContent = () => {
-  const { user } = useAuth();
-  const { isAdmin, isLagerAdmin, isSuperAdmin, adminLoading } = useAdminStatus();
+const Index = () => {
+  console.log('🚀 NOTFALL-VERSION - Keine Auth, alle Bereiche sichtbar');
 
-  // Admin-Bereiche nur für angemeldete Administratoren anzeigen
-  const showAdminAreas = user && isAdmin && !adminLoading;
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-200 to-green-400">
       <Navigation />
@@ -42,32 +37,28 @@ const IndexContent = () => {
       <ProfessionalWildfleischShop />
       <Contact />
       
-
-      {/* Admin-Bereiche - NUR für angemeldete Administratoren */}
-      {showAdminAreas && (
-        <>
-          <ShopVerwaltung />
-          <ShopBestellVerwaltung />
-          <VeranstaltungsVerwaltung />
-          <BlogVerwaltungSimple />
-          <KontaktVerwaltung />
-          <BenutzerVerwaltung />
-          <ErweiterteBenutzerverwaltung />
-        </>
-      )}
+      {/* NOTFALL: Alle Admin-Bereiche IMMER sichtbar */}
+      <div className="bg-red-100 p-4 m-4 rounded-lg border-2 border-red-500">
+        <p className="text-center font-bold text-red-800">
+          🚨 NOTFALL-MODUS: Alle Admin-Bereiche sind ohne Anmeldung sichtbar!
+        </p>
+        <p className="text-center text-red-700 mt-2">
+          Auth-System wird repariert - verwenden Sie die Funktionen zum Testen
+        </p>
+      </div>
+      
+      <ShopVerwaltung />
+      <ShopBestellVerwaltung />
+      <VeranstaltungsVerwaltung />
+      <BlogVerwaltungSimple />
+      <KontaktVerwaltung />
+      <BenutzerVerwaltung />
+      <ErweiterteBenutzerverwaltung />
 
       {/* Footer */}
       <Footer />
       <Toaster />
     </div>
-  );
-};
-
-const Index = () => {
-  return (
-    <AuthProvider>
-      <IndexContent />
-    </AuthProvider>
   );
 };
 
