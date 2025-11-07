@@ -1,8 +1,9 @@
 import React from 'react';
-import { Navigation } from '@/components/Navigation';
+import { Card, CardContent } from '@/components/ui/card';
 import { Hero } from '@/components/Hero';
-import { JagdrevierInfobox } from '@/components/JagdrevierInfobox';
+import { Navigation } from '@/components/Navigation';
 import { RevierInfo } from '@/components/RevierInfo';
+import { JagdrevierInfobox } from '@/components/JagdrevierInfobox';
 import { Wildarten } from '@/components/Wildarten';
 import { Praedatorenmanagement } from '@/components/Praedatorenmanagement';
 import { Jagdhunde } from '@/components/Jagdhunde';
@@ -16,6 +17,7 @@ import { ShopVerwaltung } from '@/components/ShopVerwaltung';
 import { ShopBestellVerwaltung } from '@/components/ShopBestellVerwaltung';
 import { BenutzerVerwaltung } from '@/components/BenutzerVerwaltung';
 import { ErweiterteBenutzerverwaltung } from '@/components/ErweiterteBenutzerverwaltung';
+
 import { BlogVerwaltungSimple } from '@/components/BlogVerwaltungSimple';
 import { KontaktVerwaltung } from '@/components/KontaktVerwaltung';
 import { VeranstaltungsVerwaltung } from '@/components/VeranstaltungsVerwaltung';
@@ -51,11 +53,10 @@ const IndexContent = () => {
           <VeranstaltungsVerwaltung />
           <BlogVerwaltungSimple />
           <KontaktVerwaltung />
-          <BenutzerVerwaltung />
           <ErweiterteBenutzerverwaltung />
         </>
       )}
-
+      
       {/* Footer */}
       <Footer />
       <Toaster />
