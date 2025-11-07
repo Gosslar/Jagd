@@ -869,11 +869,18 @@ export const ShopBestellVerwaltung: React.FC = () => {
                         {/* Aktionen */}
                         <div className="flex gap-2">
                           <Button
+                            onClick={() => generateLieferschein(selectedBestellung)}
+                            className="bg-orange-600 hover:bg-orange-700 text-white"
+                          >
+                            <FileText className="h-4 w-4 mr-2" />
+                            Lieferschein (ohne Preise)
+                          </Button>
+                          <Button
                             onClick={() => generatePDF(selectedBestellung)}
                             variant="outline"
                           >
                             <Download className="h-4 w-4 mr-2" />
-                            PDF Lieferschein
+                            PDF Bestellbestätigung
                           </Button>
                         </div>
                       </div>
