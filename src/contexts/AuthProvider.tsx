@@ -48,11 +48,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       const approved = data?.freigabe_status === 'freigegeben';
+      console.log('📊 Approval status:', approved);
       setIsApproved(approved);
       return approved;
     } catch (error) {
       console.error('Error checking approval status:', error);
-      // Bei Fehlern als freigegeben behandeln
+      // Bei Fehler als freigegeben behandeln
+      console.log('⚠️ Approval check failed, defaulting to approved');
       setIsApproved(true);
       return true;
     }
@@ -62,12 +64,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('🔑 Auth state change:', event, session?.user?.email);
+        
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          await checkApprovalStatus();
+          console.log('✅ User logged in, checking approval...');
+          try {
+            await checkApprovalStatus();
+          } catch (error) {
+            console.error('Error in checkApprovalStatus:', error);
+            setIsApproved(true); // Fallback to approved
+          }
         } else {
+          console.log('🚪 User logged out');
           setIsApproved(false);
         }
         
