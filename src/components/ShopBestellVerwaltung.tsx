@@ -666,8 +666,12 @@ export const ShopBestellVerwaltung: React.FC = () => {
   };
 
   const openBestellungDetails = (bestellung: ShopBestellung) => {
+    console.log('👁️ Öffne Bestelldetails für:', bestellung.bestellnummer);
     setSelectedBestellung(bestellung);
     setNotizen(bestellung.notizen || '');
+    
+    // Lade Bestellpositionen für diese spezifische Bestellung
+    loadBestellPositionen(bestellung.id);
   };
 
   // Filter Bestellungen nach Status
@@ -784,9 +788,9 @@ export const ShopBestellVerwaltung: React.FC = () => {
                   </DialogTrigger>
                   <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
                     <DialogHeader>
-                      <DialogTitle>Bestelldetails - {bestellung.bestellnummer}</DialogTitle>
+                      <DialogTitle>Bestelldetails - {selectedBestellung?.bestellnummer || bestellung.bestellnummer}</DialogTitle>
                     </DialogHeader>
-                    {selectedBestellung && (
+                    {selectedBestellung && selectedBestellung.id === bestellung.id && (
                       <div className="space-y-6">
                         {/* Kundeninformationen */}
                         <div className="grid grid-cols-2 gap-4">
