@@ -881,7 +881,7 @@ export const ShopBestellVerwaltung: React.FC = () => {
                           </Button>
                         </div>
                       </div>
-                    )}
+                    </div>
                   </DialogContent>
                 </Dialog>
               </div>
